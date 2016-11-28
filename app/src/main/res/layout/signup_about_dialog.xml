@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+
+    <EditText
+        android:ems="12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/signUp_address"
+        android:hint="Your Address here"
+        android:inputType="textMultiLine"
+        android:maxLines="3"/>
+
+    <EditText
+        android:ems="12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/signup_about"
+        android:hint="Please tell something about you (optional)"
+        android:inputType="textMultiLine"
+        android:maxEms="100"/>
+
+
+
+</LinearLayout>

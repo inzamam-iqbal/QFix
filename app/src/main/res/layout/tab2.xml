@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="@drawable/bg1_continue"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/small_margin">
+
+
+        <ImageView
+            android:padding="@dimen/small_margin"
+            android:src="@drawable/ind_known"
+            android:layout_width="@dimen/grid_width"
+            android:layout_height="@dimen/grid_width"
+            android:id="@+id/imageView"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <EditText
+            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="Name"
+            android:id="@+id/signup_name"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"/>
+
+        <EditText
+            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:hint="Email"
+            android:id="@+id/signup_email"
+            android:layout_below="@+id/signup_name"
+            android:layout_centerHorizontal="true" />
+
+        <RadioGroup
+            android:id="@+id/signUp_gender_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/signup_email">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male"
+                android:id="@+id/signUp_male" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female"
+                android:id="@+id/signUp_female" />
+        </RadioGroup>
+
+
+        <TextView
+            android:textColor="#000000"
+            android:layout_marginTop="@dimen/grid_width"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Click the image to change"
+            android:id="@+id/textView"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <com.hbb20.CountryCodePicker
+            android:id="@+id/ccp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:defaultNameCode="LK"
+            android:layout_below="@+id/signUp_gender_group"
+            android:layout_alignParentLeft="true" />
+        <EditText
+            android:maxLength="12"
+            android:inputType="number"
+            android:hint="Primary number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/signUp_phone_txt"
+            android:maxLines="1"
+            android:layout_alignBottom="@+id/ccp"
+            android:layout_toRightOf="@+id/ccp"
+            android:layout_toEndOf="@+id/ccp" />
+        <com.hbb20.CountryCodePicker
+            android:id="@+id/ccp1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:defaultNameCode="LK"
+            android:layout_below="@+id/ccp"
+            android:layout_alignParentLeft="true" />
+        <EditText
+            android:maxLength="12"
+            android:inputType="number"
+            android:hint="Secondary Number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/signUp_phone_txt1"
+            android:maxLines="1"
+            android:layout_alignBottom="@+id/ccp1"
+            android:layout_toRightOf="@+id/ccp1"
+            android:layout_toEndOf="@+id/ccp1" />
+        <ImageView
+            android:layout_margin="@dimen/small_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3"
+            android:layout_below="@+id/ccp1"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/abc_textfield_search_material"
+            android:background="#cacaca" />
+        <DatePicker
+            android:padding="@dimen/small_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/datePicker"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:datePickerMode="spinner"
+            android:calendarViewShown="false"
+            android:yearListSelectorColor="@color/abc_search_url_text" />
+
+        <TextView
+            android:padding="@dimen/small_margin"
+            android:textColor="#000"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Select your Date of Birth"
+            android:id="@+id/textView2"
+            android:layout_below="@+id/imageView3"
+            android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:layout_margin="@dimen/small_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2"
+            android:layout_below="@+id/datePicker"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/abc_textfield_search_material"
+            android:background="#cacaca" />
+
+
+        <android.support.v7.widget.AppCompatButton
+            android:theme="@style/AppTheme.Button"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:id="@+id/button"
+            android:layout_below="@id/imageView2"/>
+    </RelativeLayout>
+</ScrollView>
