@@ -6,9 +6,9 @@ package com.jobbs.jobsapp.utils;
 public class JobsConstants {
     public static String FIREBASE_REFERANCE_EMPLOYEE = "Employees";
     public static String FIREBASE_REFERANCE_LOGIN_KEY = "LoginKey";
-    public static String FIREBASE_REFERANCE_CATEGARY = "Categary";
+    public static String FIREBASE_REFERANCE_CATAGORY = "Catagory";
     public static String FIREBASE_REFERANCE_LOCATION = "location";
-    public static String FIREBASE_REFERANCE_CATEGARYEMPLOYEE = "CategaryEmployee";
+    public static String FIREBASE_REFERANCE_CATAGORYEMPLOYEE = "CatagoryEmployee";
 
     public static String STORAGE_REFERANCE_PROFILEPIC = "profilePic";
 

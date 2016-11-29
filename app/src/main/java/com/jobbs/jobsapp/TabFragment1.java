@@ -44,16 +44,12 @@ public class TabFragment1 extends Fragment {
         final View rootView = inflater.inflate(R.layout.tab1, container, false);
         catagaries = new ArrayList<Catagaries>();
         catagariesIds = new ArrayList<>();
-        mRef = FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_CATEGARY);
+        mRef = FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_CATAGORY);
         mRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot data:dataSnapshot.getChildren()){
                     rootView.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    catagaries.add(data.getValue(Catagaries.class));
-                    catagariesIds.add(data.getKey());
-                    catagaries.add(data.getValue(Catagaries.class));
-                    catagariesIds.add(data.getKey());
                     catagaries.add(data.getValue(Catagaries.class));
                     catagariesIds.add(data.getKey());
                     gridAdapter.notifyDataSetChanged();

@@ -30,12 +30,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jobbs.jobsapp.Adapter.PagerAdapter;
+import com.jobbs.jobsapp.model.Catagaries;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {

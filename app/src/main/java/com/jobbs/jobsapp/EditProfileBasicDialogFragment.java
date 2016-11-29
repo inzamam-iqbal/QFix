@@ -3,17 +3,13 @@ package com.jobbs.jobsapp;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,7 +18,6 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.JobsConstants;
 
 import java.util.HashMap;
@@ -102,7 +97,7 @@ public class EditProfileBasicDialogFragment extends DialogFragment {
                             childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_EMPLOYEE + "/" +
                                     userId + "/" + JobsConstants.FIREBASE_KEY_NAME, newContent);
 
-                            childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_CATEGARYEMPLOYEE + "/" +
+                            childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_CATAGORYEMPLOYEE + "/" +
                                     userId + "/" + JobsConstants.FIREBASE_KEY_NAME, newContent);
 
                             ref.updateChildren(childUpdates);

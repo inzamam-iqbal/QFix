@@ -1,6 +1,5 @@
 package com.jobbs.jobsapp.database;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -60,7 +59,7 @@ public class DbHelper {
         childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_EMPLOYEE + "/" + employee.getPhoneNum(),employee.toMap());
 
         String loginKey = dbRef.child(JobsConstants.FIREBASE_REFERANCE_LOGIN_KEY).child(employee.getPhoneNum()).push().getKey();
-        childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_CATEGARYEMPLOYEE + "/" + employee.getPhoneNum(), catagaryEmployee.toMap());
+        childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_CATAGORYEMPLOYEE + "/" + employee.getPhoneNum(), catagaryEmployee.toMap());
         childUpdates.put("/" + JobsConstants.FIREBASE_REFERANCE_LOGIN_KEY + "/" + employee.getPhoneNum() + "/" + loginKey, true);
 
         dbRef.updateChildren(childUpdates).addOnSuccessListener(new OnSuccessListener<Void>() {

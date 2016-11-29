@@ -14,11 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -37,7 +35,6 @@ import com.jobbs.jobsapp.utils.JobsConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 
 //Created by Inzimam on 8/21/2016.
@@ -157,7 +154,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
 
 //        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_CATEGARY);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_CATAGORY);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

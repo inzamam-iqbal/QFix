@@ -31,7 +31,6 @@ import com.jobbs.jobsapp.model.CatagaryEmployee;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
-import java.security.Provider;
 import java.util.ArrayList;
 
 
@@ -98,7 +97,6 @@ public class Tab1onClick extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
                 Log.e("changed","chrr");
-
                 now= location;
                 getDataFromDb(catagory);
 
@@ -107,7 +105,7 @@ public class Tab1onClick extends AppCompatActivity {
 
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
-                Log.e("long","statusss");
+                Log.e("long",s);
             }
 
             @Override
@@ -161,7 +159,7 @@ public class Tab1onClick extends AppCompatActivity {
                 child(JobsConstants.FIREBASE_REFERANCE_LOCATION).child(catagory);
 
         final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().
-                child(JobsConstants.FIREBASE_REFERANCE_CATEGARYEMPLOYEE);
+                child(JobsConstants.FIREBASE_REFERANCE_CATAGORYEMPLOYEE);
 
         tab1onClickAdapter = new Tab1onClickAdapter(Tab1onClick.this, catagaryEmployees, employeeIds );
         list=(ListView) findViewById(R.id.listView);
