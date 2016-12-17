@@ -17,6 +17,7 @@ public class JobsConstants {
     public static String FIREBASE_JOB_LABOUR = "Labour";
 
     public static String FIREBASE_KEY_CATAGORY = "catagary";
+    public static String FIREBASE_KEY_NIC = "nic";
     public static String FIREBASE_KEY_STATUS = "status";
     public static String FIREBASE_KEY_NAME = "name";
     public static String FIREBASE_KEY_SECONDARY_PHONE = "phoneNumSecondary";

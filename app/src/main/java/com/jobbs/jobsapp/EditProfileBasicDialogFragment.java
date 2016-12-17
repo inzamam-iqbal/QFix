@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.JobsConstants;
 
 import java.util.HashMap;
@@ -29,11 +31,11 @@ public class EditProfileBasicDialogFragment extends DialogFragment {
 
     private Button buttonOk;
     private EditText editText;
-    private TextView header;
     private String headertxt;
     private String content;
     private String type;
     private String userId;
+    private Employee employee;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class EditProfileBasicDialogFragment extends DialogFragment {
         content = getArguments().getString("content");
         type = getArguments().getString("type");
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
 
     }
@@ -66,19 +69,21 @@ public class EditProfileBasicDialogFragment extends DialogFragment {
         alertDialogBuilder.setView(view);
 
         editText = (EditText) view.findViewById(R.id.edit_profile_basic_edit_text);
-        header = (TextView) view.findViewById(R.id.edit_profile_basic_header);
 
         if (type.equals("email")){
             editText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            editText.setHint("your email");
+        }else if(type.equals("address")){
+            editText.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            editText.setHint("your address");
         }
 
         editText.setText(content);
-        header.setText(headertxt);
 
 
 
 
-        alertDialogBuilder.setTitle("Change status")
+        alertDialogBuilder.setTitle(headertxt)
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override

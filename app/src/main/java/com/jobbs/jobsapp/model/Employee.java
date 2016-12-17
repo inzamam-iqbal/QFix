@@ -25,6 +25,7 @@ public class Employee {
     String dob;
     String status;
     Boolean homeService;
+    String nic;
 
     public Employee() {
     }
@@ -51,6 +52,14 @@ public class Employee {
         this.email = email;
         this.dob = dob;
         this.imageUrl = imageUrl;
+    }
+
+    public String getNic() {
+        return nic;
+    }
+
+    public void setNic(String nic) {
+        this.nic = nic;
     }
 
     public Boolean getHomeService() {

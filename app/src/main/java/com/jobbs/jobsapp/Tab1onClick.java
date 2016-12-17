@@ -58,8 +58,6 @@ public class Tab1onClick extends AppCompatActivity {
 
         getData(catagoryName);
 
-        now= new Location("");
-
         employeeLoc = new Location("");
 
         if (!utils.IsNetworkConnected(getApplicationContext())){
@@ -121,9 +119,15 @@ public class Tab1onClick extends AppCompatActivity {
 
         Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
         if (location != null && (System.currentTimeMillis()-location.getTime())<5*60*1000 ){
-            now= location;
-            getDataFromDb(catagory);
-            Log.e("gotfrom","last");
+            if (location.getLatitude()!=0){
+                now= location;
+                getDataFromDb(catagory);
+                Log.e("gotfrom","last");
+            }
+
+            //now.setLatitude(Double.valueOf(String.format("%.7f",now.getLatitude())));
+            //now.setLongitude(Double.valueOf(String.format("%.7f",now.getLongitude())));
+
         }else{
             if (getProviderName().equals("passive")){
                 Toast.makeText(getApplicationContext(),
@@ -196,7 +200,16 @@ public class Tab1onClick extends AppCompatActivity {
                         CatagaryEmployee employee = dataSnapshot.getValue(CatagaryEmployee.class);
                         employeeLoc.setLatitude(location.latitude);
                         employeeLoc.setLongitude(location.longitude);
-                        employee.setDistance(now.distanceTo(employeeLoc));
+                        Log.e("reci",employeeLoc.getLatitude()+"");
+                        Log.e("reci",employeeLoc.getLongitude()+"");
+                        Log.e("now",now.getLatitude()+"");
+                        Log.e("now",now.getLongitude()+"");
+                        Log.e("dis",now.distanceTo(employeeLoc)+"");
+
+                        employee.setDistance(Double.valueOf(employeeLoc.distanceTo(now)));
+
+
+
                         catagaryEmployees.add(employee);
                         employeeIds.add(dataSnapshot.getKey());
                         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -238,5 +251,27 @@ public class Tab1onClick extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         locationManager.removeUpdates(locationListner);
+    }
+
+    public static double distance(double lat1, double lat2, double lon1,
+                                  double lon2, double el1, double el2) {
+
+        final int R = 6371; // Radius of the earth
+
+        Double latDistance = Math.toRadians(lat2 - lat1);
+        Log.e("latDIs",latDistance+"");
+        Double lonDistance = Math.toRadians(lon2 - lon1);
+        Log.e("longDIs",lonDistance+"");
+        Double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        double height = el1 - el2;
+
+        distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+        return Math.sqrt(distance);
     }
 }

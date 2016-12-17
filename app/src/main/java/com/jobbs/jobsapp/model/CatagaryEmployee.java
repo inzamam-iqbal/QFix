@@ -14,7 +14,7 @@ public class CatagaryEmployee {
     String gender;
     String dob;
     String imageUrl;
-    Float distance;
+    Double distance;
     String status;
     double updateTime;
     Boolean homeService;
@@ -63,11 +63,11 @@ public class CatagaryEmployee {
         this.imageUrl = imageUrl;
     }
 
-    public Float getDistance() {
+    public Double getDistance() {
         return distance;
     }
 
-    public void setDistance(Float distance) {
+    public void setDistance(Double distance) {
         this.distance = distance;
     }
 

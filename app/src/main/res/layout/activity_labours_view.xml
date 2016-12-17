@@ -152,7 +152,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Contact Number"
+                    android:text="Secondary Number"
                     android:id="@+id/textView6" />
                 <TextView
                     android:layout_weight="0.6"

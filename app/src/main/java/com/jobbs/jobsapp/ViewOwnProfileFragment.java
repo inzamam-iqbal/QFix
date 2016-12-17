@@ -77,7 +77,7 @@ public class ViewOwnProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.activity_labours_view, container, false);
-        ((MainActivity)getActivity()).location();
+
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().
                 child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId);
@@ -184,7 +184,6 @@ public class ViewOwnProfileFragment extends Fragment {
                     @Override
                     public boolean onLongClick(View view) {
                         Bundle args = new Bundle();
-                        args.putString("address", employee.getAddress());
                         args.putString("about", employee.getAbout());
                         args.putBoolean("edit", true);
 
@@ -199,14 +198,16 @@ public class ViewOwnProfileFragment extends Fragment {
                 text_address.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        Bundle args = new Bundle();
-                        args.putString("address", employee.getAddress());
-                        args.putString("about", employee.getAbout());
-                        args.putBoolean("edit", true);
                         FragmentManager manager = getActivity().getSupportFragmentManager();
-                        SignupAboutDialogFragment dialog = new SignupAboutDialogFragment();
+
+                        Bundle args = new Bundle();
+                        args.putString("header", "Change Address");
+                        args.putString("content", employee.getAddress());
+                        args.putString("type", "address");
+
+                        EditProfileBasicDialogFragment dialog = new EditProfileBasicDialogFragment();
                         dialog.setArguments(args);
-                        dialog.show(manager, "Address and About");
+                        dialog.show(manager, "Change Address");
                         return false;
                     }
                 });

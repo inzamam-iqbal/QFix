@@ -4,14 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/edit_profile_basic_header"
-        android:text="Change status"
-        android:textSize="20dp"
-        android:padding="10dp"/>
-
 
     <EditText
         android:inputType="number"

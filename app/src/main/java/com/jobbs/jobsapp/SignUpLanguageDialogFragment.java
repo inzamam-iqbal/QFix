@@ -110,10 +110,6 @@ public class SignUpLanguageDialogFragment extends DialogFragment {
                     public void onClick(View v) {
                         CheckBox cb = (CheckBox) v ;
                         SignUpLanguage signUpLanguage = (SignUpLanguage) cb.getTag();
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Clicked on Checkbox: " + cb.getText() +
-                                        " is " + cb.isChecked(),
-                                Toast.LENGTH_LONG).show();
                         signUpLanguage.setSelected(cb.isChecked());
                     }
                 });
@@ -180,15 +176,15 @@ public class SignUpLanguageDialogFragment extends DialogFragment {
                             }else{
                                 TabFragment2.employee.setLanguages(selectedLanguages);
                                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                                SignupAboutDialogFragment dialog = new SignupAboutDialogFragment();
+                                SignupAdressDialogFragment dialog = new SignupAdressDialogFragment();
                                 dialog.setCancelable(false);
-                                dialog.show(manager, "Address and About");
+                                dialog.show(manager, "Address and NIC");
                             }
 
                             getDialog().dismiss();
                         }else{
                             Toast.makeText(getActivity().getApplicationContext(),"you must select atleast one" +
-                                    " language", Toast.LENGTH_LONG);
+                                    " language", Toast.LENGTH_LONG).show();
                             return;
                         }
                     }

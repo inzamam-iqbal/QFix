@@ -179,9 +179,6 @@ public class TabFragment2 extends Fragment {
                                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                         @Override
                                         public void onComplete(@NonNull Task<AuthResult> task) {
-                                            SharedPreferences.Editor editor = sharedPref.edit();
-                                            editor.putString("done", "yes");
-                                            editor.commit();
                                             Log.e("haha", "signInWithCustomToken:onComplete:" + task.isSuccessful());
                                             ShowLoadingMessage(false);
                                             gotPin = false;
@@ -368,7 +365,7 @@ public class TabFragment2 extends Fragment {
 
 
 
-                            UploadTask uploadTask = storageRef.child(primaryNum.getText().toString()).
+                            UploadTask uploadTask = storageRef.child("users").child(primaryNum.getText().toString()).
                                     child(JobsConstants.STORAGE_REFERANCE_PROFILEPIC).putBytes(imageBytes);
 
                             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -376,11 +373,21 @@ public class TabFragment2 extends Fragment {
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                     String downloadUrl = taskSnapshot.getDownloadUrl().toString();
 
-                                    employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                            primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
-                                            secondaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
-                                            email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
-                                            +"-"+ Integer.toString(day),downloadUrl);
+                                    if (secondaryNum.length()>7){
+                                        employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
+                                                primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
+                                                secondaryCountryCode.getFullNumberWithPlus()+secondaryNum.getText().toString(),
+                                                email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
+                                                +"-"+ Integer.toString(day),downloadUrl);
+                                    }else{
+                                        employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
+                                                primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
+                                                null,email.getText().toString(),
+                                                Integer.toString(year)+"-"+ Integer.toString(month)
+                                                +"-"+ Integer.toString(day),downloadUrl);
+                                    }
+
+
                                     ShowLoadingMessage(false);
                                     showJobDialog(v);
                                 }

@@ -111,10 +111,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                     public void onClick(View v) {
                         CheckBox cb = (CheckBox) v ;
                         SignUpCatagory signUpCatagory = (SignUpCatagory) cb.getTag();
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Clicked on Checkbox: " + cb.getText() +
-                                        " is " + cb.isChecked(),
-                                Toast.LENGTH_LONG).show();
+
                         signUpCatagory.setSelected(cb.isChecked());
                     }
                 });
@@ -194,53 +191,72 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        int count =0;
-                        HashMap<String,Boolean> selectedJobs = new HashMap<String, Boolean>();
-                        for (SignUpCatagory job:listitems){
-                            if (job.isSelected()) {
-                                selectedJobs.put(job.getName(),true);
-                                count+=1;
-                                if (count==4){
-                                    Toast.makeText(getActivity().getApplicationContext(),
-                                            "Can't select more than 3 catogaries",Toast.LENGTH_LONG);
-                                    return;
-                                }
-                            }
-                        }
 
-                        if (count>0){
-                            if (isEdit){
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                                ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
-                                        child(JobsConstants.FIREBASE_KEY_CATAGORY).setValue(selectedJobs);
-                            }else{
-                                TabFragment2.employee.setCatagary(selectedJobs);
-
-                                FragmentManager manager = getActivity().getSupportFragmentManager();
-
-                                SignUpHomeServiceDialogFragment dialog = new SignUpHomeServiceDialogFragment();
-                                dialog.show(manager, "Home Service");
-                            }
-
-
-                            getDialog().dismiss();
-                        }else {
-                            Toast.makeText(getActivity().getApplicationContext(),"you must select " +
-                                    "atleast one catagory",Toast.LENGTH_LONG);
-                            return;
-                        }
 
 
                     }
                 });
 
+        final AlertDialog alertDialog=alertDialogBuilder.create();
 
-        return alertDialogBuilder.create();
+
+        return alertDialog;
 
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        final AlertDialog d = (AlertDialog)getDialog();
+        if(d != null)
+        {
+            Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+
+                    int count =0;
+                    HashMap<String,Boolean> selectedJobs = new HashMap<String, Boolean>();
+                    for (SignUpCatagory job:listitems){
+                        if (job.isSelected()) {
+                            selectedJobs.put(job.getName(),true);
+                            count+=1;
+                            if (count==4){
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "Can't select more than 3 catogaries",Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+                    }
+
+                    if (count>0){
+                        if (isEdit){
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                            ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
+                                    child(JobsConstants.FIREBASE_KEY_CATAGORY).setValue(selectedJobs);
+                        }else{
+                            TabFragment2.employee.setCatagary(selectedJobs);
+
+                            FragmentManager manager = getActivity().getSupportFragmentManager();
+
+                            SignUpHomeServiceDialogFragment dialog = new SignUpHomeServiceDialogFragment();
+                            dialog.show(manager, "Home Service");
+                            getDialog().dismiss();
+                        }
 
 
+
+                    }else {
+                        Toast.makeText(getActivity().getApplicationContext(),"you must select " +
+                                "atleast one catagory",Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+            });
+        }
+    }
 }
 

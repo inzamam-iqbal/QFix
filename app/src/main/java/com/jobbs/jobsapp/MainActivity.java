@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("came","eee");
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String done=sharedPref.getString("done","no");
+            Log.e("statuss",done);
             if(!done.equals("yes")){
                 Log.e("logOut","yes");
                 mAuth.signOut();
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 tab1.setText("Profile");
                 Log.e("signed","gotcha");
             }
-
+        location();
         }
 
 

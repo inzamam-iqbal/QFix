@@ -10,10 +10,18 @@
         android:ems="12"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/signup_about"
-        android:hint="Please tell something about you (optional)"
+        android:id="@+id/signUp_address"
+        android:hint="Please provide your address here"
         android:inputType="textMultiLine"
-        android:maxEms="100"/>
+        android:maxLines="3"/>
+
+    <EditText
+        android:ems="12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/signup_nic"
+        android:hint="National Identity card Number"
+        android:maxEms="15"/>
 
 
 
