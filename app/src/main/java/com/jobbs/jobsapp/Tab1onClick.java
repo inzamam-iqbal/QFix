@@ -48,6 +48,7 @@ public class Tab1onClick extends AppCompatActivity {
     private Location employeeLoc;
     private LocationListener locationListner;
     private String lastKey;
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,15 +187,16 @@ public class Tab1onClick extends AppCompatActivity {
         });
 
         GeoFire geoFire = new GeoFire(locRef);
+        count=0;
 
-
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(userLocation.getLatitude(),
-                userLocation.getLongitude()), 200);
+        final GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(userLocation.getLatitude(),
+                userLocation.getLongitude()), 5);
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, final GeoLocation location) {
                 lastKey = key;
+                count++;
                 userRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -202,7 +204,7 @@ public class Tab1onClick extends AppCompatActivity {
                         employeeLoc.setLatitude(location.latitude);
                         employeeLoc.setLongitude(location.longitude);
 
-                        employee.setDistance(Double.valueOf(employeeLoc.distanceTo(userLocation)));
+                        employee.setDistance((double)employeeLoc.distanceTo(userLocation));
 
                         catagaryEmployees.add(employee);
                         employeeIds.add(dataSnapshot.getKey());
@@ -240,6 +242,15 @@ public class Tab1onClick extends AppCompatActivity {
 
             @Override
             public void onGeoQueryReady() {
+                if (count<15 && geoQuery.getRadius()<150){
+                    if (geoQuery.getRadius()==5){
+                        geoQuery.setRadius(10);
+                    }else if (geoQuery.getRadius()==10){
+                        geoQuery.setRadius(25);
+                    }else{
+                        geoQuery.setRadius(150);
+                    }
+                }
                 Log.e("done","geoDone");
             }
 
