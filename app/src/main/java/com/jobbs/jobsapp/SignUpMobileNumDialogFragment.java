@@ -118,7 +118,7 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
 
-                        //MainActivity.adapter.notifyDataSetChanged();
+                        //MainActivity.pagerAdapter.notifyDataSetChanged();
                         pin = editText.getText().toString();
                         employee = TabFragment2.employee;
 

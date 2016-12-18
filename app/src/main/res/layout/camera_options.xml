@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:weightSum="1"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
 
     <LinearLayout
         android:gravity="center"
@@ -17,6 +16,7 @@
             android:id="@+id/imageButton2"
             android:background="@drawable/gallary" />
     </LinearLayout>
+
     <LinearLayout
         android:gravity="center"
         android:layout_weight="0.5"
@@ -28,8 +28,6 @@
             android:id="@+id/imageButton"
             android:background="@drawable/camera"/>
     </LinearLayout>
-
-
 
 
 

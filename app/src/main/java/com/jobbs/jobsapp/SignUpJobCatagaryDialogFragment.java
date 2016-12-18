@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.firebase.geofire.GeoFire;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,7 +34,9 @@ import com.jobbs.jobsapp.model.Catagaries;
 import com.jobbs.jobsapp.model.SignUpCatagory;
 import com.jobbs.jobsapp.utils.JobsConstants;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -49,6 +52,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
     ProgressBar progressBar;
     private boolean isEdit = false;
     private String userId;
+    private ArrayList<String> oldCatagories;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,6 +60,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
 
         try{
             isEdit = getArguments().getBoolean("edit");
+            oldCatagories = getArguments().getStringArrayList("catagories");
         }catch (Exception e){
 
         }
@@ -75,62 +80,6 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
 
 
     }
-
-    private class MyCustomAdapter extends ArrayAdapter<SignUpCatagory> {
-
-        private ArrayList<SignUpCatagory> catagoryList;
-
-        public MyCustomAdapter(Context context, int textViewResourceId,
-                               ArrayList<SignUpCatagory> catagoryList) {
-            super(context, textViewResourceId, catagoryList);
-            this.catagoryList = new ArrayList<SignUpCatagory>();
-            this.catagoryList.addAll(catagoryList);
-        }
-
-        private class ViewHolder {
-            TextView code;
-            CheckBox name;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            ViewHolder holder = null;
-            Log.v("ConvertView", String.valueOf(position));
-
-            if (convertView == null) {
-                LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = vi.inflate(R.layout.signup_job_catagary_listview, null);
-
-                holder = new ViewHolder();
-                holder.code = (TextView) convertView.findViewById(R.id.signUp_jobs_cataogary_list_text);
-                holder.name = (CheckBox) convertView.findViewById(R.id.signUp_jobs_cataogary_list_checkBox);
-                convertView.setTag(holder);
-
-                holder.name.setOnClickListener( new View.OnClickListener() {
-                    public void onClick(View v) {
-                        CheckBox cb = (CheckBox) v ;
-                        SignUpCatagory signUpCatagory = (SignUpCatagory) cb.getTag();
-
-                        signUpCatagory.setSelected(cb.isChecked());
-                    }
-                });
-            }
-            else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            SignUpCatagory signUpCatagory = catagoryList.get(position);
-            holder.name.setText(signUpCatagory.getName());
-            holder.name.setChecked(signUpCatagory.isSelected());
-            holder.name.setTag(signUpCatagory);
-
-            return convertView;
-
-        }
-
-    }
-
 
 
 
@@ -161,6 +110,9 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                     String jobName =jobCatagory.getName();
                     String jobId= data.getKey();
                     SignUpCatagory signUpCatagory = new SignUpCatagory(jobName, jobId);
+                    if (oldCatagories.contains(jobName)){
+                        signUpCatagory.setSelected(true);
+                    }
                     if(!listitems.contains(signUpCatagory)){
                         listitems.add(signUpCatagory);
                     }
@@ -234,9 +186,26 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
 
                     if (count>0){
                         if (isEdit){
+                            progressBar.setVisibility(View.VISIBLE);
+
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                             ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
                                     child(JobsConstants.FIREBASE_KEY_CATAGORY).setValue(selectedJobs);
+
+                            DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference().
+                                    child(JobsConstants.FIREBASE_REFERANCE_LOCATION);
+
+                            GeoFire geoFire = new GeoFire(locationRef);
+
+                            for (String catagory: oldCatagories){
+                                geoFire.removeLocation(catagory + "/" + userId, new GeoFire.CompletionListener() {
+                                    @Override
+                                    public void onComplete(String key, DatabaseError error) {
+                                        getDialog().dismiss();
+                                    }
+                                });
+                            }
+
                         }else{
                             TabFragment2.employee.setCatagary(selectedJobs);
 
@@ -257,6 +226,61 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                 }
             });
         }
+    }
+
+    private class MyCustomAdapter extends ArrayAdapter<SignUpCatagory> {
+
+        private ArrayList<SignUpCatagory> catagoryList;
+
+        public MyCustomAdapter(Context context, int textViewResourceId,
+                               ArrayList<SignUpCatagory> catagoryList) {
+            super(context, textViewResourceId, catagoryList);
+            this.catagoryList = new ArrayList<SignUpCatagory>();
+            this.catagoryList.addAll(catagoryList);
+        }
+
+        private class ViewHolder {
+            TextView code;
+            CheckBox name;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder holder = null;
+            Log.v("ConvertView", String.valueOf(position));
+
+            if (convertView == null) {
+                LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = vi.inflate(R.layout.signup_job_catagary_listview, null);
+
+                holder = new ViewHolder();
+                holder.code = (TextView) convertView.findViewById(R.id.signUp_jobs_cataogary_list_text);
+                holder.name = (CheckBox) convertView.findViewById(R.id.signUp_jobs_cataogary_list_checkBox);
+                convertView.setTag(holder);
+
+                holder.name.setOnClickListener( new View.OnClickListener() {
+                    public void onClick(View v) {
+                        CheckBox cb = (CheckBox) v ;
+                        SignUpCatagory signUpCatagory = (SignUpCatagory) cb.getTag();
+
+                        signUpCatagory.setSelected(cb.isChecked());
+                    }
+                });
+            }
+            else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            SignUpCatagory signUpCatagory = catagoryList.get(position);
+            holder.name.setText(signUpCatagory.getName());
+            holder.name.setChecked(signUpCatagory.isSelected());
+            holder.name.setTag(signUpCatagory);
+
+            return convertView;
+
+        }
+
     }
 }
 

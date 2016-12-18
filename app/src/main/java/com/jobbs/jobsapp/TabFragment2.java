@@ -123,6 +123,7 @@ public class TabFragment2 extends Fragment {
     private TimerTask timerTask;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String link;
+    private String primaryNumber;
     OkHttpClient client;
     private SharedPreferences sharedPref;
 
@@ -131,10 +132,9 @@ public class TabFragment2 extends Fragment {
         @Override
         public void onReceive(final Context context, Intent intent) {
             if (intent.getAction().equals(CallReceiver.MSG_CALL_START)) {
-                Log.e("detected", "t");
+                Log.e("Tab2:call detected", "true");
                 if (intent.getBooleanExtra("incoming", false) && gotPin) {
                     HangupCall();
-                    Log.e("detected", "in");
                     gotPin=false;
                     final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                     Map<String, String> params = new HashMap<String, String>();
@@ -144,9 +144,6 @@ public class TabFragment2 extends Fragment {
                     params.put("id", requestId.toString());
                     params.put("pin", recivedNum.substring(recivedNum.length() - 4));
                     JSONObject parameter = new JSONObject(params);
-                    Log.e("sending", parameter.toString());
-                    //OkHttpClient client = new OkHttpClient();
-
 
                     RequestBody body = RequestBody.create(JSON, parameter.toString());
                     Request request = new Request.Builder()
@@ -171,22 +168,21 @@ public class TabFragment2 extends Fragment {
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String token = response.body().string();
-                            Log.e("response", token);
+                            Log.e("Tab2:Auth response", token);
                             token = token.substring(1, token.length() - 1);
-                            Log.e("response", token);
 
                             mAuth.signInWithCustomToken(token)
                                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                         @Override
                                         public void onComplete(@NonNull Task<AuthResult> task) {
-                                            Log.e("haha", "signInWithCustomToken:onComplete:" + task.isSuccessful());
+                                            Log.e("Tab2", "signInWithCustomToken:onComplete:" + task.isSuccessful());
                                             ShowLoadingMessage(false);
                                             gotPin = false;
                                             // If sign in fails, display a message to the user. If sign in succeeds
                                             // the auth state listener will be notified and logic to handle the
                                             // signed in user can be handled in the listener.
                                             if (!task.isSuccessful()) {
-                                                Log.e("auth", "signInWithCustomToken", task.getException());
+                                                Log.e("Tab2:", "signInWithCustomToken", task.getException());
                                                 Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
                                                         Toast.LENGTH_SHORT).show();
 
@@ -205,7 +201,6 @@ public class TabFragment2 extends Fragment {
             }
             if (intent.getAction().equals(CallReceiver.MSG_CALL_END)) {
                 if (!intent.getBooleanExtra("incoming", false)) {
-                    Log.e("detected", "other");
                 }
 
             }
@@ -241,13 +236,12 @@ public class TabFragment2 extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRef = FirebaseDatabase.getInstance().getReference();
 
+        mRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         nameKey = "-11980787113102610";
-
-       // name = ImageUtils.getName(getActivity().getApplicationContext());
         link = "jobsappserver.herokuapp.com/a";
         linkv = "jobsappserver.herokuapp.com/b";
 
@@ -256,20 +250,13 @@ public class TabFragment2 extends Fragment {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.e("logged","in");
+                    Log.e("Tab2:","Logged in");
                 } else {
                     // User is signed out
                 }
                 // ...
             }
         };
-
-
-        //////////////////////
-
-
-
-
 
         getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_START));
         getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_END));
@@ -281,16 +268,7 @@ public class TabFragment2 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.tab2, container, false);
 
-        name = (EditText) rootView.findViewById(R.id.signup_name);
-        email = (EditText) rootView.findViewById(R.id.signup_email);
-        primaryNum = (EditText) rootView.findViewById(R.id.signUp_phone_txt);
-        secondaryNum = (EditText) rootView.findViewById(R.id.signUp_phone_txt1);
-        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
-        primaryCountryCode = (CountryCodePicker) rootView.findViewById(R.id.ccp);
-        secondaryCountryCode = (CountryCodePicker) rootView.findViewById(R.id.ccp1);
-        profilePic = (ImageView) rootView.findViewById(R.id.imageView);
-        submitBtn = (Button) rootView.findViewById(R.id.button);
-        genderGroup = (RadioGroup) rootView.findViewById(R.id.signUp_gender_group);
+        initializeUiElements(rootView);
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -302,7 +280,7 @@ public class TabFragment2 extends Fragment {
                         String[] perms = {android.Manifest.permission.CAMERA};
                         if (EasyPermissions.hasPermissions(getActivity(), perms)) {
                             // Already have permission, do the thing
-                            showInputDialog(getActivity());
+                            showCameraOptions(getActivity());
                             // ...
                         } else {
                             // Do not have permissions, request them now
@@ -311,7 +289,7 @@ public class TabFragment2 extends Fragment {
                             return;
                         }
                     }else{
-                        showInputDialog(getActivity());
+                        showCameraOptions(getActivity());
                     }
 
                 }
@@ -327,10 +305,6 @@ public class TabFragment2 extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-
-
-
                 int selectedId = genderGroup.getCheckedRadioButtonId();
                 selctedGender = (RadioButton) rootView.findViewById(selectedId);
 
@@ -338,8 +312,7 @@ public class TabFragment2 extends Fragment {
                 month = datePicker.getMonth() + 1;
                 year = datePicker.getYear();
 
-                //showJobDialog(v);
-                //showLanguageDialog(v);
+
                 if(name.getText().toString().length()<3 || name.getText().toString() == null){
                     Toast.makeText(getActivity().getApplicationContext(),"Invalid name", Toast.LENGTH_LONG).show();
                 }else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()){
@@ -357,25 +330,27 @@ public class TabFragment2 extends Fragment {
                         @Override
                         protected void onPostExecute(byte[] imageBytes) {
                             // image here is compressed & ready to be sent to the server
-                            //Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                            DbHelper dbHelper = new DbHelper(getActivity().getApplicationContext());
 
                             FirebaseStorage storage = FirebaseStorage.getInstance();
                             StorageReference storageRef = storage.getReferenceFromUrl("gs://jobs-8d5e5.appspot.com");
 
-
-
                             UploadTask uploadTask = storageRef.child("users").child(primaryNum.getText().toString()).
                                     child(JobsConstants.STORAGE_REFERANCE_PROFILEPIC).putBytes(imageBytes);
+                            primaryNumber = primaryNum.getText().toString();
+                            if (primaryNumber.startsWith("0")){
+                                primaryNumber = primaryNumber.substring(1);
+                            }
 
                             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                     String downloadUrl = taskSnapshot.getDownloadUrl().toString();
 
+
+
                                     if (secondaryNum.length()>7){
                                         employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                                primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
+                                                primaryCountryCode.getFullNumberWithPlus()+primaryNumber,
                                                 secondaryCountryCode.getFullNumberWithPlus()+secondaryNum.getText().toString(),
                                                 email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
                                                 +"-"+ Integer.toString(day),downloadUrl);
@@ -406,7 +381,7 @@ public class TabFragment2 extends Fragment {
                     }else{
                         employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
                                 primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
-                                secondaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
+                                secondaryCountryCode.getFullNumberWithPlus()+primaryNumber,
                                 email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
                                 +"-"+ Integer.toString(day),"default");
                         showJobDialog(v);
@@ -416,13 +391,24 @@ public class TabFragment2 extends Fragment {
                 }
 
 
-
-
             }
 
         });
 
         return rootView;
+    }
+
+    private void initializeUiElements(View rootView) {
+        name = (EditText) rootView.findViewById(R.id.signup_name);
+        email = (EditText) rootView.findViewById(R.id.signup_email);
+        primaryNum = (EditText) rootView.findViewById(R.id.signUp_phone_txt);
+        secondaryNum = (EditText) rootView.findViewById(R.id.signUp_phone_txt1);
+        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
+        primaryCountryCode = (CountryCodePicker) rootView.findViewById(R.id.ccp);
+        secondaryCountryCode = (CountryCodePicker) rootView.findViewById(R.id.ccp1);
+        profilePic = (ImageView) rootView.findViewById(R.id.imageView);
+        submitBtn = (Button) rootView.findViewById(R.id.button);
+        genderGroup = (RadioGroup) rootView.findViewById(R.id.signUp_gender_group);
     }
 
     public void showJobDialog(View view) {
@@ -435,7 +421,7 @@ public class TabFragment2 extends Fragment {
 
     }
 
-    protected  void showInputDialog(final Activity context) {
+    protected  void showCameraOptions(final Activity context) {
 
         // get prompts.xml view
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -457,8 +443,6 @@ public class TabFragment2 extends Fragment {
                 imageToUploadUri = Uri.fromFile(imageFile);
                 startActivityForResult(chooserIntent, CAMERA_REQUEST);
 
-//                Intent i=new Intent(promptView.getContext(),Main2Activity.class);
-//                father.startActivity(i);
                 alert.cancel();
 
             }
@@ -471,8 +455,6 @@ public class TabFragment2 extends Fragment {
                 Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
 
-//                Intent i=new Intent(promptView.getContext(),Main2Activity.class);
-//                father.startActivity(i);
                 alert.cancel();
 
             }
@@ -486,16 +468,12 @@ public class TabFragment2 extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == -1 && null != data) {
             imagePath = ImageUtils.getImagePathFromGallery(getActivity().getApplicationContext(), data);
-            //String imagePath = db.getImageUrlWithAuthority(getApplicationContext(),data.getData());
-            Log.e("f", imagePath);
             Uri imageUri = Uri.parse(imagePath);
-            //bitmap = ImageUtils.getImageFromPath(getApplicationContext(), imagePath);
             Picasso.with(getActivity()).load(new File(imageUri.getPath())).into(profilePic);
 
 
         }else if(requestCode == CAMERA_REQUEST && resultCode == -1 ) {
             Uri selectedImage = imageToUploadUri;
-            Log.e("atleast",selectedImage.getPath());
             getActivity().getContentResolver().notifyChange(selectedImage, null);
             imagePath = selectedImage.getPath();
             Picasso.with(getActivity()).load(imageFile).into(profilePic);
@@ -519,7 +497,7 @@ public class TabFragment2 extends Fragment {
 
     private void OnClickValidate() {
 
-        Log.e("onClick","came");
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] perms = {android.Manifest.permission.READ_PHONE_STATE, android.Manifest.permission.READ_EXTERNAL_STORAGE};
             if (EasyPermissions.hasPermissions(getActivity(), perms)) {
@@ -534,7 +512,6 @@ public class TabFragment2 extends Fragment {
             }
         }
 
-        Log.e("onClick","came3");
         dialingNumber = primaryCountryCode.getFullNumberWithPlus().toString()+primaryNum.getText().toString();
         if (!utils.IsNetworkConnected(getActivity())) {
             Toast.makeText(getActivity().getApplicationContext(), "No Internet", Toast.LENGTH_LONG).show();
@@ -548,11 +525,9 @@ public class TabFragment2 extends Fragment {
 
 
 
-        Log.e("onClick","came4");
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         Map<String, String> params = new HashMap<String, String>();
         params.put("myKey", nameKey);
-        Log.e("keeey",nameKey);
         params.put("num", dialingNumber);
         JSONObject parameter = new JSONObject(params);
 
@@ -569,7 +544,6 @@ public class TabFragment2 extends Fragment {
                 .post(body)
                 .addHeader("content-type", "application/json; charset=utf-8")
                 .build();
-        Log.e("link",link);
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -587,12 +561,11 @@ public class TabFragment2 extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String reply = response.body().string();
-                Log.e("response", reply);
                 try {
                     JSONObject resp = new JSONObject(reply);
                     requestId = resp.get("id");
                     gotPin = true;
-                    Log.e("gotpin", gotPin + "");
+                    Log.e("Tab2:gotpin", gotPin + "");
 
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString("requestedId", requestId.toString());

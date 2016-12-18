@@ -26,12 +26,9 @@ import java.util.ArrayList;
 
 public class TabFragment1 extends Fragment {
 
-    //dummy text
     ArrayList<Catagaries> catagaries;
     ArrayList<String> catagariesIds;
     DatabaseReference mRef;
-    private LocationManager locationManager;
-    private ArrayList<String> employeesNeededIds;
     private GridAdapter gridAdapter;
 
     @Override
@@ -73,7 +70,6 @@ public class TabFragment1 extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent d=new Intent(getActivity(),Tab1onClick.class);
                 d.putExtra("name",catagaries.get(position).getName());
-                //d.putParcelableArrayListExtra()
                 startActivity(d);
 
             }

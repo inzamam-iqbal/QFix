@@ -202,6 +202,7 @@ public class Employee {
             }else{
                 results+=key;
             }
+            i++;
         }
         return results;
     }
@@ -216,6 +217,7 @@ public class Employee {
             }else{
                 results+=key;
             }
+            i++;
         }
         return results;
     }

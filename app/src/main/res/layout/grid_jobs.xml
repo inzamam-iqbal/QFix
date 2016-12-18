@@ -2,25 +2,28 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="bottom">
+    android:gravity="center">
 
     <ImageView
         android:layout_width="@dimen/grid_width"
         android:layout_height="@dimen/grid_width"
+        android:layout_centerHorizontal="true"
         android:id="@+id/jobsImage"
         android:src="@drawable/img1"
-        android:layout_marginLeft="10dp"        />
+        />
 
     <TextView
-        android:gravity="center"
+        android:layout_marginTop="5dp"
         android:textColor="@color/colorPrimary"
+        android:textSize="12dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Small Text"
         android:id="@+id/textView_title"
         android:layout_centerHorizontal="true"
-        android:layout_alignBottom="@+id/jobsImage"/>
+        android:layout_alignBottom="@+id/jobsImage"
+        />
 
 
 </RelativeLayout>

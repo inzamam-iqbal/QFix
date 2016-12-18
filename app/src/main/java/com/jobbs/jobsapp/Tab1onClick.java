@@ -32,6 +32,8 @@ import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 
 public class Tab1onClick extends AppCompatActivity {
@@ -42,30 +44,27 @@ public class Tab1onClick extends AppCompatActivity {
     private String catagoryName;
     private Tab1onClickAdapter tab1onClickAdapter;
     private ListView list;
-    private Location now;
+    private Location userLocation;
     private Location employeeLoc;
     private LocationListener locationListner;
+    private String lastKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab1on_click);
 
+        //get the name of the catagory selected
         catagoryName = getIntent().getStringExtra("name");
-
-        catagaryEmployees = new ArrayList<>();
-        employeeIds = new ArrayList<>();
-
-        getData(catagoryName);
-
-        employeeLoc = new Location("");
 
         if (!utils.IsNetworkConnected(getApplicationContext())){
             Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
         }
+        employeeLoc = new Location("");
+        catagaryEmployees = new ArrayList<>();
+        employeeIds = new ArrayList<>();
 
-
-
+        getData(catagoryName);
 
     }
 
@@ -76,8 +75,8 @@ public class Tab1onClick extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
                 android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("perm","no");
-            // TODO: Consider calling
+            Log.e("permission","no");
+            // TODO: Change to EasyPerm
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -86,16 +85,15 @@ public class Tab1onClick extends AppCompatActivity {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }else{
-            Log.e("perm","yes");
+            Log.e("permmission","yes");
         }
-        Log.e("perm","came");
 
 
         locationListner = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 Log.e("changed","chrr");
-                now= location;
+                userLocation = location;
                 getDataFromDb(catagory);
 
 
@@ -117,24 +115,26 @@ public class Tab1onClick extends AppCompatActivity {
             }
         };
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-        if (location != null && (System.currentTimeMillis()-location.getTime())<5*60*1000 ){
-            if (location.getLatitude()!=0){
-                now= location;
-                getDataFromDb(catagory);
-                Log.e("gotfrom","last");
-            }
+        Location location = locationManager.getLastKnownLocation(getProviderName());
+        //Location locationNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Log.e("Currenttime",System.currentTimeMillis()+"");
+        if (location != null && location.getLatitude()!=0){
+            userLocation = location;
+            getDataFromDb(catagory);
+            Log.e("gotfrom",location.getProvider());
 
-            //now.setLatitude(Double.valueOf(String.format("%.7f",now.getLatitude())));
-            //now.setLongitude(Double.valueOf(String.format("%.7f",now.getLongitude())));
+            //userLocation.setLatitude(Double.valueOf(String.format("%.7f",userLocation.getLatitude())));
+            //userLocation.setLongitude(Double.valueOf(String.format("%.7f",userLocation.getLongitude())));
 
         }else{
+            Log.e("kk","k");
             if (getProviderName().equals("passive")){
                 Toast.makeText(getApplicationContext(),
                         "Please turn on location service",Toast.LENGTH_LONG).show();
                 Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(myIntent);
             }else{
+                Log.e("kk","kl");
                 locationManager.requestSingleUpdate(getProviderName(), locationListner,null);
 
             }
@@ -188,33 +188,37 @@ public class Tab1onClick extends AppCompatActivity {
         GeoFire geoFire = new GeoFire(locRef);
 
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(now.getLatitude(),
-                now.getLongitude()), 200);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(userLocation.getLatitude(),
+                userLocation.getLongitude()), 200);
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, final GeoLocation location) {
+                lastKey = key;
                 userRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         CatagaryEmployee employee = dataSnapshot.getValue(CatagaryEmployee.class);
                         employeeLoc.setLatitude(location.latitude);
                         employeeLoc.setLongitude(location.longitude);
-                        Log.e("reci",employeeLoc.getLatitude()+"");
-                        Log.e("reci",employeeLoc.getLongitude()+"");
-                        Log.e("now",now.getLatitude()+"");
-                        Log.e("now",now.getLongitude()+"");
-                        Log.e("dis",now.distanceTo(employeeLoc)+"");
 
-                        employee.setDistance(Double.valueOf(employeeLoc.distanceTo(now)));
-
-
+                        employee.setDistance(Double.valueOf(employeeLoc.distanceTo(userLocation)));
 
                         catagaryEmployees.add(employee);
                         employeeIds.add(dataSnapshot.getKey());
                         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
+                        if (dataSnapshot.getKey().equals(lastKey)){
+                            Collections.sort(catagaryEmployees, new Comparator<CatagaryEmployee>() {
+                                @Override
+                                public int compare(CatagaryEmployee ce1, CatagaryEmployee ce2) {
+                                    return ce1.getDistance().compareTo(ce2.getDistance());
+                                }
+                            });
+                            Log.e("Tab1OnClick:sorted",dataSnapshot.getKey());
+                        }
                         tab1onClickAdapter.notifyDataSetChanged();
-                        Log.e("foundd",dataSnapshot.getKey());
+
                     }
 
                     @Override
@@ -236,7 +240,6 @@ public class Tab1onClick extends AppCompatActivity {
 
             @Override
             public void onGeoQueryReady() {
-
                 Log.e("done","geoDone");
             }
 

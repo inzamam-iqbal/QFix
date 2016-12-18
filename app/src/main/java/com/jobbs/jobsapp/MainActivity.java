@@ -30,25 +30,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jobbs.jobsapp.Adapter.PagerAdapter;
-import com.jobbs.jobsapp.model.Catagaries;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
 
-
+//TODO: make oldLanguage selected
     public boolean isSignedIn=false;
-    public PagerAdapter adapter;
+    public PagerAdapter pagerAdapter;
     private LocationManager locationManager;
     private GeoFire geoFire;
     public static String userId;
-    private Employee employee;
     private ArrayList<String> catagoryArray;
     private LocationListener locationListener;
     private TabLayout tabLayout;
@@ -61,51 +58,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //initialize DB,Auth and geoFire
         DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference().
                 child(JobsConstants.FIREBASE_REFERANCE_LOCATION);
-
-        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("User"));
-        tab1 = tabLayout.newTab().setText("SignUp");
-        tabLayout.addTab(tab1);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         geoFire = new GeoFire(locationRef);
 
         mAuth = FirebaseAuth.getInstance();
 
+        //setup the page
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.addTab(tabLayout.newTab().setText("Services"));
+        tab1 = tabLayout.newTab().setText("SignUp");
+        tabLayout.addTab(tab1);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                Log.e("why","dontknow");
-                if (user != null) {
-                    Log.e("logged","inAuthStateListener");
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    String done=sharedPref.getString("done","no");
-                    if(!done.equals("yes")){
-                        mAuth.signOut();
-                    }else{
-                        userId = user.getUid();
-                        tab1.setText("Profile");
-                        Log.e("signed","gotcha");
-                    }
-
-                } else {
-
-                    // User is signed out
-                }
-                // ...
+                isSignedInAndRegistrationComplete(user);
             }
         };
-        Log.e("pinn", ImageUtils.getName(getApplicationContext()));
-
-
+        Log.e("Main:pinn", ImageUtils.getName(getApplicationContext()));
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        adapter = new PagerAdapter
+        pagerAdapter = new PagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount(),isSignedIn);
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -133,60 +115,44 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user != null){
-            isSignedIn = true;
-            Log.e("came","eee");
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            String done=sharedPref.getString("done","no");
-            Log.e("statuss",done);
-            if(!done.equals("yes")){
-                Log.e("logOut","yes");
-                mAuth.signOut();
-            }else{
-                userId = user.getUid();
-                tab1.setText("Profile");
-                Log.e("signed","gotcha");
-            }
-        location();
-        }
-
-
+        isSignedInAndRegistrationComplete(user);
+        getData();
 
         if (!utils.IsNetworkConnected(getApplicationContext())){
             Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
         }
 
-
     }
 
-    public void location(){
 
-        Log.e("called","lll");
-        if(userId==null){
-            userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        }
-        DatabaseReference employeeRef = FirebaseDatabase.getInstance().getReference().getRef().
-                child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
-                child(JobsConstants.FIREBASE_KEY_CATAGORY);
+    public void getData(){
 
-        employeeRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                catagoryArray = new ArrayList<String>();
+        if (isSignedIn){
+            DatabaseReference employeeRef = FirebaseDatabase.getInstance().getReference().getRef().
+                    child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
+                    child(JobsConstants.FIREBASE_KEY_CATAGORY);
 
-                for (DataSnapshot data: dataSnapshot.getChildren()){
-                    catagoryArray.add(data.getKey());
+            employeeRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    catagoryArray = new ArrayList<String>();
+
+                    for (DataSnapshot data: dataSnapshot.getChildren()){
+                        catagoryArray.add(data.getKey());
+                    }
+                    getLocation();
+
                 }
-                getLocation();
 
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }else{
+            getLocation();
+        }
 
-            }
-        });
 
     }
 
@@ -196,8 +162,8 @@ public class MainActivity extends AppCompatActivity {
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("perm","no");
-            // TODO: Consider calling
+            Log.e("Main:permission","no");
+            // TODO: change to easy perm
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -206,9 +172,8 @@ public class MainActivity extends AppCompatActivity {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }else{
-            Log.e("perm","yes");
+            Log.e("Main:permmission","yes");
         }
-        Log.e("perm","came");
 
         locationListener =new LocationListener() {
             @Override
@@ -236,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
-                Log.e("long","statusss");
+                Log.e("Main:locationListner","status changed");
             }
 
             @Override
@@ -246,17 +211,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProviderDisabled(String s) {
-                Log.e("long","disabled");
-                Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(myIntent);
+                Log.e("Main:locationListner","provider disabled");
+                turnOnLocation();
             }
         };
 
         if (getProviderName() == null || getProviderName().equals("passive")){
-            Toast.makeText(getApplicationContext(),
-                    "Please turn on location service",Toast.LENGTH_LONG).show();
-            Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(myIntent);
+            turnOnLocation();
         }else{
             if (isSignedIn) {
                 locationManager.requestLocationUpdates(getProviderName(), 600000, 0, locationListener);
@@ -284,8 +245,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Provide your criteria and flag enabledOnly that tells
         // LocationManager only to return active providers.
-        Log.e(locationManager.getBestProvider(criteria, true).toString(),"hhh");
-        return locationManager.getBestProvider(criteria, true);
+        String provider = locationManager.getBestProvider(criteria, true);
+        Log.e("Main:Location Provider",provider);
+        return provider;
     }
 
     @Override
@@ -300,6 +262,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+    }
+
+    private void turnOnLocation(){
+        Toast.makeText(getApplicationContext(),
+                "Please turn on location service",Toast.LENGTH_LONG).show();
+        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(myIntent);
+    }
+
+    private void isSignedInAndRegistrationComplete(FirebaseUser user){
+        if (user != null){
+            isSignedIn = true;
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String done=sharedPref.getString("done","no");
+            if(!done.equals("yes")){
+                Log.e("Main:logOut","yes");
+                mAuth.signOut();
+            }else{
+                userId = user.getUid();
+                tab1.setText("Profile");
+                Log.e("signed","gotcha");
+            }
+        }
     }
 }
 

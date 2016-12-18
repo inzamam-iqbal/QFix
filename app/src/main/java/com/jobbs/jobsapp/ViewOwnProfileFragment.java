@@ -38,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.jobbs.jobsapp.database.DbHelper;
+import com.jobbs.jobsapp.model.Catagaries;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.ImageCompressionAsyncTask;
 import com.jobbs.jobsapp.utils.ImageUtils;
@@ -47,6 +48,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -65,6 +68,7 @@ public class ViewOwnProfileFragment extends Fragment {
     private static int CAMERA_REQUEST =2;
     private String imagePath;
     private Employee employee;
+    private HashMap<String,Boolean> catagoryNames;
     private WeakReference<ProgressDialog> loadingDialog;
     private String userId;
 
@@ -115,6 +119,8 @@ public class ViewOwnProfileFragment extends Fragment {
                 }else{
                     Picasso.with(getActivity()).load(employee.getImageUrl()).into(profilePic);
                 }
+
+                catagoryNames = employee.getCatagary();
                 //textView_status.setText(employee);
 
                 btn_status.setOnClickListener(new View.OnClickListener() {
@@ -172,6 +178,10 @@ public class ViewOwnProfileFragment extends Fragment {
 
                         Bundle args = new Bundle();
                         args.putBoolean("edit", true);
+
+                        ArrayList<String> jobNames = new ArrayList<>(catagoryNames.keySet());
+
+                        args.putStringArrayList("catagories",jobNames);
 
                         SignUpJobCatagaryDialogFragment dialog = new SignUpJobCatagaryDialogFragment();
                         dialog.setArguments(args);

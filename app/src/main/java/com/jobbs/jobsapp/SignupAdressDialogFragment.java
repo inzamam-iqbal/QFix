@@ -75,7 +75,7 @@ public class SignupAdressDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
 
-                        //MainActivity.adapter.notifyDataSetChanged();
+                        //MainActivity.pagerAdapter.notifyDataSetChanged();
                         address = editTextAddress.getText().toString();
                         nic = editTextNic.getText().toString();
                         employee = TabFragment2.employee;
@@ -89,7 +89,7 @@ public class SignupAdressDialogFragment extends DialogFragment {
                                     child(JobsConstants.FIREBASE_KEY_NIC).setValue(nic);
 
                         }else{
-                            employee.setAbout(address);
+                            employee.setAddress(address);
                             employee.setNic(nic);
 
                             FragmentManager manager = getActivity().getSupportFragmentManager();

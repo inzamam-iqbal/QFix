@@ -54,7 +54,7 @@ public class Tab1onClickAdapter extends ArrayAdapter<CatagaryEmployee> {
         statusTxt.setText(catagaryEmployee.getStatus());
         Log.e("status ",catagaryEmployee.getStatus());
 
-        TextView distance = (TextView) rowView.findViewById(R.id.distance_listView);
+        TextView distanceTxt = (TextView) rowView.findViewById(R.id.distance_listView);
         try{
             if (catagaryEmployee.getImageUrl().equals("default")){
                 imageView.setImageResource(R.drawable.camera);
@@ -64,7 +64,16 @@ public class Tab1onClickAdapter extends ArrayAdapter<CatagaryEmployee> {
         }catch (Exception e){
 
         }
-        distance.setText(catagaryEmployees.get(position).getDistance()+"m");
+        Double distance = catagaryEmployees.get(position).getDistance();
+
+        if (distance > 1000) {
+            String d = String.format("%.2f Km",distance/1000);
+            distanceTxt.setText(d);
+        }else{
+            String d = String.format("%.2f m",distance);
+            distanceTxt.setText(d);
+        }
+
 
         return rowView;
     }
