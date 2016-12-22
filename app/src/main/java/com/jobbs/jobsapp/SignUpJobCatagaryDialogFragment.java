@@ -44,7 +44,7 @@ import java.util.HashMap;
 
 
 public class SignUpJobCatagaryDialogFragment extends DialogFragment {
-
+//hello
     ArrayList<SignUpCatagory> listitems =new ArrayList<>();
     MyCustomAdapter dataAdapter = null;
     ListView mylist;
@@ -163,7 +163,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
         final AlertDialog d = (AlertDialog)getDialog();
         if(d != null)
         {
-            Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
+            Button positiveButton =(Button) d.getButton(Dialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override

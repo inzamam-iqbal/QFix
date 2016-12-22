@@ -39,7 +39,6 @@ import java.util.Comparator;
 public class Tab1onClick extends AppCompatActivity {
 
     ArrayList<CatagaryEmployee> catagaryEmployees;
-    ArrayList<String> employeeIds;
     private LocationManager locationManager;
     private String catagoryName;
     private Tab1onClickAdapter tab1onClickAdapter;
@@ -63,7 +62,6 @@ public class Tab1onClick extends AppCompatActivity {
         }
         employeeLoc = new Location("");
         catagaryEmployees = new ArrayList<>();
-        employeeIds = new ArrayList<>();
 
         getData(catagoryName);
 
@@ -166,7 +164,7 @@ public class Tab1onClick extends AppCompatActivity {
         final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().
                 child(JobsConstants.FIREBASE_REFERANCE_CATAGORYEMPLOYEE);
 
-        tab1onClickAdapter = new Tab1onClickAdapter(Tab1onClick.this, catagaryEmployees, employeeIds );
+        tab1onClickAdapter = new Tab1onClickAdapter(Tab1onClick.this, catagaryEmployees );
         list=(ListView) findViewById(R.id.listView);
         list.setAdapter(tab1onClickAdapter);
 
@@ -178,9 +176,9 @@ public class Tab1onClick extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                Log.e("clicked",position+"");
                 Intent d=new Intent(Tab1onClick.this,ViewProfile.class);
-                d.putExtra("EmployeeId",employeeIds.get(position));
+                d.putExtra("EmployeeId",catagaryEmployees.get(position).getKey());
                 startActivity(d);
 
             }
@@ -205,9 +203,8 @@ public class Tab1onClick extends AppCompatActivity {
                         employeeLoc.setLongitude(location.longitude);
 
                         employee.setDistance((double)employeeLoc.distanceTo(userLocation));
-
+                        employee.setKey(dataSnapshot.getKey());
                         catagaryEmployees.add(employee);
-                        employeeIds.add(dataSnapshot.getKey());
                         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
                         if (dataSnapshot.getKey().equals(lastKey)){

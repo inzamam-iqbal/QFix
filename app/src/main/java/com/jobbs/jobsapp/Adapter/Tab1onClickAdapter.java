@@ -23,15 +23,13 @@ public class Tab1onClickAdapter extends ArrayAdapter<CatagaryEmployee> {
 
     private final Activity context;
     private final ArrayList<CatagaryEmployee> catagaryEmployees;
-    private ArrayList<String> employeeIds;
 
 
-    public Tab1onClickAdapter(Activity context,ArrayList<CatagaryEmployee> catagaryEmployees,
-                              ArrayList<String> employeeIds) {
+    public Tab1onClickAdapter(Activity context,ArrayList<CatagaryEmployee> catagaryEmployees) {
         super(context, R.layout.list_tab1on_click, catagaryEmployees);
         this.context = context;
         this.catagaryEmployees = catagaryEmployees;
-        this.employeeIds = employeeIds;
+
 
     }
 

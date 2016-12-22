@@ -87,7 +87,6 @@ public class ViewOwnProfileFragment extends Fragment {
                 child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId);
 
         textView_name = (TextView) view.findViewById(R.id.textView_name);
-        text_callButton=(TextView)view.findViewById(R.id.button_status);
         text_about=(TextView)view.findViewById(R.id.textView_about);
         text_contacts=(TextView)view.findViewById(R.id.textView_contactNumber);
         text_age=(TextView)view.findViewById(R.id.textView_age);

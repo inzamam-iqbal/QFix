@@ -18,6 +18,8 @@ public class CatagaryEmployee {
     String status;
     double updateTime;
     Boolean homeService;
+    @Exclude
+    String key;
 
     public CatagaryEmployee() {
     }
@@ -93,6 +95,15 @@ public class CatagaryEmployee {
 
     public void setHomeService(Boolean homeService) {
         this.homeService = homeService;
+    }
+
+    @Exclude
+    public String getKey() {
+        return key;
+    }
+    @Exclude
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Exclude
