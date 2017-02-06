@@ -30,10 +30,7 @@ public class SignupAdressDialogFragment extends DialogFragment {
     private String oldAddress;
     private String userId;
     private String address;
-    private String oldNic;
-    private String nic;
     private EditText editTextAddress;
-    private EditText editTextNic;
 
 
     @Override
@@ -43,7 +40,6 @@ public class SignupAdressDialogFragment extends DialogFragment {
         try{
             isEdit = getArguments().getBoolean("edit");
             oldAddress = getArguments().getString("address");
-            oldNic = getArguments().getString("nic");
         }catch (Exception e){
 
         }
@@ -62,13 +58,11 @@ public class SignupAdressDialogFragment extends DialogFragment {
         alertDialogBuilder.setView(view);
 
         editTextAddress = (EditText) view.findViewById(R.id.signUp_address);
-        editTextNic = (EditText) view.findViewById(R.id.signup_nic);
         if (isEdit){
             editTextAddress.setText(oldAddress);
-            editTextNic.setText(oldNic);
         }
 
-        alertDialogBuilder.setTitle("Address and NIC")
+        alertDialogBuilder.setTitle("Address")
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -77,7 +71,6 @@ public class SignupAdressDialogFragment extends DialogFragment {
 
                         //MainActivity.pagerAdapter.notifyDataSetChanged();
                         address = editTextAddress.getText().toString();
-                        nic = editTextNic.getText().toString();
                         employee = TabFragment2.employee;
 
                         if(isEdit){
@@ -85,12 +78,10 @@ public class SignupAdressDialogFragment extends DialogFragment {
                             ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
                                     child(JobsConstants.FIREBASE_KEY_ADDRESS).setValue(address);
 
-                            ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
-                                    child(JobsConstants.FIREBASE_KEY_NIC).setValue(nic);
+
 
                         }else{
                             employee.setAddress(address);
-                            employee.setNic(nic);
 
                             FragmentManager manager = getActivity().getSupportFragmentManager();
                             SignupAboutDialogFragment dialog = new SignupAboutDialogFragment();

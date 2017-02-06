@@ -53,6 +53,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
     private boolean isEdit = false;
     private String userId;
     private ArrayList<String> oldCatagories;
+    private int counter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,9 +111,13 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                     String jobName =jobCatagory.getName();
                     String jobId= data.getKey();
                     SignUpCatagory signUpCatagory = new SignUpCatagory(jobName, jobId);
-                    if (oldCatagories.contains(jobName)){
-                        signUpCatagory.setSelected(true);
+
+                    if(isEdit){
+                        if (oldCatagories.contains(jobName)){
+                            signUpCatagory.setSelected(true);
+                        }
                     }
+
                     if(!listitems.contains(signUpCatagory)){
                         listitems.add(signUpCatagory);
                     }
@@ -183,25 +188,33 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                             }
                         }
                     }
-
+                    final HashMap<String,Boolean> tempSelectedJobs = selectedJobs;
                     if (count>0){
                         if (isEdit){
                             progressBar.setVisibility(View.VISIBLE);
 
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                            ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
-                                    child(JobsConstants.FIREBASE_KEY_CATAGORY).setValue(selectedJobs);
+
 
                             DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference().
                                     child(JobsConstants.FIREBASE_REFERANCE_LOCATION);
 
                             GeoFire geoFire = new GeoFire(locationRef);
+                            final Dialog thisDialog = getDialog();
+
+                            counter=oldCatagories.size();
 
                             for (String catagory: oldCatagories){
                                 geoFire.removeLocation(catagory + "/" + userId, new GeoFire.CompletionListener() {
                                     @Override
                                     public void onComplete(String key, DatabaseError error) {
-                                        getDialog().dismiss();
+                                        counter--;
+                                        if (counter==0){
+                                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                                            ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
+                                                    child(JobsConstants.FIREBASE_KEY_CATAGORY).setValue(tempSelectedJobs);
+                                            thisDialog.dismiss();
+                                        }
+
                                     }
                                 });
                             }
@@ -212,6 +225,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                             FragmentManager manager = getActivity().getSupportFragmentManager();
 
                             SignUpHomeServiceDialogFragment dialog = new SignUpHomeServiceDialogFragment();
+                            dialog.setCancelable(false);
                             dialog.show(manager, "Home Service");
                             getDialog().dismiss();
                         }

@@ -2,6 +2,8 @@ package com.jobbs.jobsapp;
 
 
 import android.*;
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,8 +33,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -62,11 +67,15 @@ import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
@@ -124,11 +133,17 @@ public class TabFragment2 extends Fragment {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String link;
     private String primaryNumber;
+    private Button signIn;
+    private Button signUp;
+    private ScrollView signUpForm;
+    private LinearLayout defaultView;
+    private LinearLayout signInForm;
     OkHttpClient client;
     private SharedPreferences sharedPref;
+    private Button signInSubmit;
 
 
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+ /*   private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
             if (intent.getAction().equals(CallReceiver.MSG_CALL_START)) {
@@ -205,19 +220,20 @@ public class TabFragment2 extends Fragment {
 
             }
         }
-    };
+    };*/
     private Object requestId;
+    private Uri mCropImageUri;
 
 
-    private void StopReverseCliTimer() {
+    /*private void StopReverseCliTimer() {
         if (timer != null) {
             timer.cancel();
             timer = null;
             timerTask = null;
         }
-    }
+    }*/
 
-    private void HangupCall() {
+    /*private void HangupCall() {
         try {
             TelephonyManager tm = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
             Class c = Class.forName(tm.getClass().getName());
@@ -231,7 +247,7 @@ public class TabFragment2 extends Fragment {
         } catch (Exception ex) {
             Log.e("Failed to hangup the", ex.getMessage());
         }
-    }
+    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -258,11 +274,13 @@ public class TabFragment2 extends Fragment {
             }
         };
 
-        getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_START));
-        getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_END));
+       // getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_START));
+     //   getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_END));
 
 
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -270,9 +288,26 @@ public class TabFragment2 extends Fragment {
 
         initializeUiElements(rootView);
 
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                defaultView.setVisibility(View.GONE);
+                signUpForm.setVisibility(View.VISIBLE);
+            }
+        });
+
+        signIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                defaultView.setVisibility(View.GONE);
+                signInForm.setVisibility(View.VISIBLE);
+            }
+        });
+
+
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if(!utils.IsNetworkConnected(getActivity())){
                     Toast.makeText(getActivity().getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
                 }else {
@@ -280,7 +315,7 @@ public class TabFragment2 extends Fragment {
                         String[] perms = {android.Manifest.permission.CAMERA};
                         if (EasyPermissions.hasPermissions(getActivity(), perms)) {
                             // Already have permission, do the thing
-                            showCameraOptions(getActivity());
+                            startActivityForResult(CropImage.getPickImageChooserIntent(getContext()),CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE);
                             // ...
                         } else {
                             // Do not have permissions, request them now
@@ -289,13 +324,40 @@ public class TabFragment2 extends Fragment {
                             return;
                         }
                     }else{
-                        showCameraOptions(getActivity());
+                        startActivityForResult(CropImage.getPickImageChooserIntent(getContext()),CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE);
                     }
 
                 }
-
             }
         });
+        signInSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String number = ((EditText)rootView.findViewById(R.id.signIn_phone_txt)).getText().toString();
+                if (number.startsWith("0")){
+                    number = number.substring(1);
+                }
+
+                if (number.length()>8){
+                    String fullNumber = ((CountryCodePicker)rootView.findViewById(R.id.ccp_signIn)).
+                            getFullNumberWithPlus() + number;
+
+                    validationRequest(fullNumber);
+
+                    FragmentManager manager = getActivity().getSupportFragmentManager();
+
+                    Bundle args = new Bundle();
+                    args.putString("number", fullNumber);
+
+
+                    SignInMobileNumVerification dialog = new SignInMobileNumVerification();
+                    dialog.setArguments(args);
+                    dialog.setCancelable(false);
+                    dialog.show(manager, "Verify");
+                }
+            }
+        });
+
 
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -323,61 +385,78 @@ public class TabFragment2 extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(),"Invalid Date of birth", Toast.LENGTH_LONG).show();
                 }else if(selctedGender.getText().toString()==null){
                     Toast.makeText(getActivity().getApplicationContext(),"No Gender selected", Toast.LENGTH_LONG).show();
-                }else{
-                    OnClickValidate();
+                }else if (OnClickValidate()){
+
 
                     ImageCompressionAsyncTask imageCompression = new ImageCompressionAsyncTask() {
                         @Override
                         protected void onPostExecute(byte[] imageBytes) {
                             // image here is compressed & ready to be sent to the server
 
-                            FirebaseStorage storage = FirebaseStorage.getInstance();
-                            StorageReference storageRef = storage.getReferenceFromUrl("gs://jobs-8d5e5.appspot.com");
 
-                            UploadTask uploadTask = storageRef.child("users").child(primaryNum.getText().toString()).
-                                    child(JobsConstants.STORAGE_REFERANCE_PROFILEPIC).putBytes(imageBytes);
-                            primaryNumber = primaryNum.getText().toString();
-                            if (primaryNumber.startsWith("0")){
-                                primaryNumber = primaryNumber.substring(1);
-                            }
-
-                            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    String downloadUrl = taskSnapshot.getDownloadUrl().toString();
-
-
-
-                                    if (secondaryNum.length()>7){
-                                        employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                                primaryCountryCode.getFullNumberWithPlus()+primaryNumber,
-                                                secondaryCountryCode.getFullNumberWithPlus()+secondaryNum.getText().toString(),
-                                                email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
-                                                +"-"+ Integer.toString(day),downloadUrl);
-                                    }else{
-                                        employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                                primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
-                                                null,email.getText().toString(),
-                                                Integer.toString(year)+"-"+ Integer.toString(month)
-                                                +"-"+ Integer.toString(day),downloadUrl);
-                                    }
-
-
-                                    ShowLoadingMessage(false);
-                                    showJobDialog(v);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
 
                         }
                     };
                     if (imagePath !=null){
-                        imageCompression.execute(imagePath);// imagePath as a string
+                        //imageCompression.execute(imagePath);// imagePath as a string
                         ShowLoadingMessage(true);
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        StorageReference storageRef = storage.getReferenceFromUrl("gs://jobs-8d5e5.appspot.com");
+                        Log.e("image",imagePath);
+                        profilePic.setImageURI(Uri.parse(imagePath));
+                        Bitmap bitmap = null;
+
+                        try {
+                            bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(),Uri.parse(imagePath));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Log.e("err","ee");
+                        }
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, stream);
+                        byte[] byteArray = stream.toByteArray();
+
+                        primaryNumber = primaryNum.getText().toString();
+                        if (primaryNumber.startsWith("0")){
+                            primaryNumber = primaryNumber.substring(1);
+                        }
+
+                        UploadTask uploadTask = storageRef.child("users").child(primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString()).
+                                child(JobsConstants.STORAGE_REFERANCE_PROFILEPIC).putBytes(byteArray);
+
+
+                        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                String downloadUrl = taskSnapshot.getDownloadUrl().toString();
+
+
+
+                                if (secondaryNum.length()>7){
+                                    employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
+                                            primaryCountryCode.getFullNumberWithPlus()+primaryNumber,
+                                            secondaryCountryCode.getFullNumberWithPlus()+secondaryNum.getText().toString(),
+                                            email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
+                                            +"-"+ Integer.toString(day),downloadUrl);
+                                }else{
+                                    employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
+                                            primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
+                                            null,email.getText().toString(),
+                                            Integer.toString(year)+"-"+ Integer.toString(month)
+                                                    +"-"+ Integer.toString(day),downloadUrl);
+                                }
+
+
+                                ShowLoadingMessage(false);
+                                showJobDialog(v);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+
                     }else{
                         employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
                                 primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
@@ -409,6 +488,17 @@ public class TabFragment2 extends Fragment {
         profilePic = (ImageView) rootView.findViewById(R.id.imageView);
         submitBtn = (Button) rootView.findViewById(R.id.button);
         genderGroup = (RadioGroup) rootView.findViewById(R.id.signUp_gender_group);
+        signIn = (Button)rootView.findViewById(R.id.btn_signin);
+        signUp = (Button) rootView.findViewById(R.id.btn_signup);
+        signInForm = (LinearLayout)rootView.findViewById(R.id.signin_tab2);
+        signUpForm = (ScrollView) rootView.findViewById(R.id.signup_tab2);
+        defaultView = (LinearLayout) rootView.findViewById(R.id.default_tab2);
+        signInSubmit = (Button) rootView.findViewById(R.id.btn_signIn_submit);
+
+    }
+
+    public void onProfilePicClick(View view){
+
     }
 
     public void showJobDialog(View view) {
@@ -464,22 +554,44 @@ public class TabFragment2 extends Fragment {
     }
 
     @Override
+    @SuppressLint("NewApi")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == -1 && null != data) {
-            imagePath = ImageUtils.getImagePathFromGallery(getActivity().getApplicationContext(), data);
-            Uri imageUri = Uri.parse(imagePath);
-            Picasso.with(getActivity()).load(new File(imageUri.getPath())).into(profilePic);
+        // handle result of pick image chooser
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(getContext(), data);
 
-
-        }else if(requestCode == CAMERA_REQUEST && resultCode == -1 ) {
-            Uri selectedImage = imageToUploadUri;
-            getActivity().getContentResolver().notifyChange(selectedImage, null);
-            imagePath = selectedImage.getPath();
-            Picasso.with(getActivity()).load(imageFile).into(profilePic);
-
+            // For API >= 23 we need to check specifically that we have permissions to read external storage.
+            if (CropImage.isReadExternalStoragePermissionsRequired(getContext(), imageUri)) {
+                // request permissions and handle the result in onRequestPermissionsResult()
+                mCropImageUri = imageUri;
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},   CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
+            } else {
+                // no permissions required or already grunted, can start crop image activity
+                startCropImageActivity(imageUri);
+            }
         }
+        else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == -1) {
+                Uri resultUri = result.getUri();
+                imagePath = resultUri.toString();
+                profilePic.setImageURI(resultUri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+    }
 
+    private void startCropImageActivity(Uri imageUri) {
+        Intent intent = CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setCropShape(CropImageView.CropShape.OVAL)
+                .setAspectRatio(1,1)
+                .setFixAspectRatio(true)
+                .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
+                .setOutputCompressQuality(80)
+                .getIntent(getActivity());
+        startActivityForResult(intent, CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
     private void ShowLoadingMessage(boolean show) {
@@ -495,7 +607,7 @@ public class TabFragment2 extends Fragment {
 
     }
 
-    private void OnClickValidate() {
+    private boolean OnClickValidate() {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -508,27 +620,40 @@ public class TabFragment2 extends Fragment {
                 EasyPermissions.requestPermissions(this, "We need Phone State permission to verify your account" +
                                 "and  write storage permissions are essential for the functioning of this app",
                         100, perms);
-                return;
+                return false;
             }
         }
 
         dialingNumber = primaryCountryCode.getFullNumberWithPlus().toString()+primaryNum.getText().toString();
         if (!utils.IsNetworkConnected(getActivity())) {
             Toast.makeText(getActivity().getApplicationContext(), "No Internet", Toast.LENGTH_LONG).show();
-            return;
+            return false;
         }
 
         if (dialingNumber.length() < 8) {
             Toast.makeText(getActivity().getApplicationContext(), "Invalid phone number", Toast.LENGTH_LONG).show();
-            return;
+            return false;
         }
 
 
+        validationRequest(dialingNumber);
 
+        return true;
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mAuthListener!=null){
+            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+        }
+        //getActivity().unregisterReceiver(receiver);
+    }
+
+    private void validationRequest(String number){
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         Map<String, String> params = new HashMap<String, String>();
         params.put("myKey", nameKey);
-        params.put("num", dialingNumber);
+        params.put("num", number);
         JSONObject parameter = new JSONObject(params);
 
         Builder b = new Builder();
@@ -577,11 +702,5 @@ public class TabFragment2 extends Fragment {
 
 
         });
-
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getActivity().unregisterReceiver(receiver);
     }
 }

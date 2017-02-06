@@ -10,7 +10,7 @@
         android:id="@+id/text_change_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLength="100"/>
+        android:maxLength="32"/>
 
 
 </LinearLayout>

@@ -45,6 +45,8 @@ public class Tab1onClickAdapter extends ArrayAdapter<CatagaryEmployee> {
 
         ImageView imageView = (ImageView) rowView.findViewById(R.id.image_listView);
 
+        ImageView homeServiceImage = (ImageView) rowView.findViewById(R.id.catagory_employee_homeservice_img);
+
         TextView ageTxt = (TextView) rowView.findViewById(R.id.catagory_employee_age);
         ageTxt.setText("Age "+catagaryEmployee.getAgeFromDOB());
 
@@ -62,14 +64,11 @@ public class Tab1onClickAdapter extends ArrayAdapter<CatagaryEmployee> {
         }catch (Exception e){
 
         }
-        Double distance = catagaryEmployees.get(position).getDistance();
 
-        if (distance > 1000) {
-            String d = String.format("%.2f Km",distance/1000);
-            distanceTxt.setText(d);
-        }else{
-            String d = String.format("%.2f m",distance);
-            distanceTxt.setText(d);
+        distanceTxt.setText(catagaryEmployees.get(position).getDistanceAsString());
+
+        if (catagaryEmployee.getHomeService()){
+            homeServiceImage.setImageResource(R.drawable.home);
         }
 
 

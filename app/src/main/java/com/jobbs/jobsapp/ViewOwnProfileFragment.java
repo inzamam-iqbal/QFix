@@ -62,6 +62,8 @@ public class ViewOwnProfileFragment extends Fragment {
             textView_catogory,textView_language, textView_status,textView_name;
     private Button btn_status;
     private ImageView profilePic;
+    private View loadingView, mainView;
+
     private File imageFile;
     private Uri imageToUploadUri;
     private static int RESULT_LOAD_IMAGE = 1;
@@ -71,6 +73,8 @@ public class ViewOwnProfileFragment extends Fragment {
     private HashMap<String,Boolean> catagoryNames;
     private WeakReference<ProgressDialog> loadingDialog;
     private String userId;
+    private ValueEventListener dbValueEventListner;
+    private DatabaseReference dbRef;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,30 +83,16 @@ public class ViewOwnProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.activity_labours_view, container, false);
+    public void onStart() {
+        super.onStart();
 
-
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().
-                child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId);
-
-        textView_name = (TextView) view.findViewById(R.id.textView_name);
-        text_about=(TextView)view.findViewById(R.id.textView_about);
-        text_contacts=(TextView)view.findViewById(R.id.textView_contactNumber);
-        text_age=(TextView)view.findViewById(R.id.textView_age);
-        text_email=(TextView)view.findViewById(R.id.textView_email);
-        text_address=(TextView)view.findViewById(R.id.textView_address);
-        textView_catogory=(TextView) view.findViewById(R.id.textView_catogory);
-        textView_language=(TextView) view.findViewById(R.id.textView_language);
-        profilePic=(ImageView)view.findViewById(R.id.imageView_profilePic);
-        textView_status = (TextView) view.findViewById(R.id.textView_status);
-        btn_status = (Button) view.findViewById(R.id.button_status);
-
-        dbRef.addValueEventListener(new ValueEventListener() {
+        dbValueEventListner = dbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                view.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                view.findViewById(R.id.labours_view_main_layout).setVisibility(View.VISIBLE);
+
+                loadingView.setVisibility(View.GONE);
+                mainView.setVisibility(View.VISIBLE);
+
                 employee = dataSnapshot.getValue(Employee.class);
                 textView_name.setText(employee.getName());
                 text_about.setText(employee.getAbout());
@@ -304,8 +294,34 @@ public class ViewOwnProfileFragment extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.activity_labours_view, container, false);
+
+
+        dbRef= FirebaseDatabase.getInstance().getReference().
+                child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId);
+
+        textView_name = (TextView) view.findViewById(R.id.textView_name);
+        text_about=(TextView)view.findViewById(R.id.textView_about);
+        text_contacts=(TextView)view.findViewById(R.id.textView_contactNumber);
+        text_age=(TextView)view.findViewById(R.id.textView_age);
+        text_email=(TextView)view.findViewById(R.id.textView_email);
+        text_address=(TextView)view.findViewById(R.id.textView_address);
+        textView_catogory=(TextView) view.findViewById(R.id.textView_catogory);
+        textView_language=(TextView) view.findViewById(R.id.textView_language);
+        profilePic=(ImageView)view.findViewById(R.id.imageView_profilePic);
+        textView_status = (TextView) view.findViewById(R.id.textView_status);
+        btn_status = (Button) view.findViewById(R.id.button_status);
+
+        loadingView = view.findViewById(R.id.loadingPanel);
+        mainView = view.findViewById(R.id.labours_view_main_layout);
         return view;
     }
+
+
 
 
     protected  void showInputDialog(final Activity context) {
@@ -363,6 +379,14 @@ public class ViewOwnProfileFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if (dbValueEventListner != null){
+            dbRef.removeEventListener(dbValueEventListner);
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == -1 && null != data) {
@@ -405,6 +429,8 @@ public class ViewOwnProfileFragment extends Fragment {
                         ref.child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
                                 child(JobsConstants.FIREBASE_KEY_IMAGE_URL).
                                 setValue(downloadUrl);
+                        ref.child(JobsConstants.FIREBASE_REFERANCE_CATAGORYEMPLOYEE).child(userId).
+                                child(JobsConstants.FIREBASE_KEY_IMAGE_URL).setValue(downloadUrl);
                         ShowLoadingMessage(false);
 
                     }

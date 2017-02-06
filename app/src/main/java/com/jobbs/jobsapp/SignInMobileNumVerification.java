@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,17 +13,13 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,8 +29,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.jobbs.jobsapp.database.DbHelper;
 import com.jobbs.jobsapp.model.CatagaryEmployee;
 import com.jobbs.jobsapp.model.Employee;
-import com.jobbs.jobsapp.model.SignUpCatagory;
-import com.jobbs.jobsapp.model.SignUpLanguage;
 import com.jobbs.jobsapp.utils.ImageUtils;
 
 import org.json.JSONObject;
@@ -43,9 +36,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -57,9 +50,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * Created by Inzimam on 9/24/2016.
+ * Created by Inzimam on 1/20/2017.
  */
-public class SignUpMobileNumDialogFragment extends DialogFragment {
+public class SignInMobileNumVerification extends DialogFragment {
 
     Button buttonOk;
     private String userId;
@@ -67,11 +60,13 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
     private WeakReference<ProgressDialog> loadingDialog;
     private Employee employee;
     private EditText editText;
-    private  FragmentTransaction trans;
+    private FragmentTransaction trans;
     private SharedPreferences sharedPreferences;
     private String pin;
     private Activity activity;
     private Handler handler;
+
+    private String primaryNum;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +74,12 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
         activity =getActivity();
+
+        try{
+            primaryNum = getArguments().getString("number");
+        }catch (Exception e){
+
+        }
 
     }
 
@@ -120,12 +121,6 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
 
                         //MainActivity.pagerAdapter.notifyDataSetChanged();
                         pin = editText.getText().toString();
-                        employee = TabFragment2.employee;
-
-                        userId =employee.getPhoneNum();
-
-                        employee.setStatus("Hi there, Do you need my help?");
-
 
                         validate();
 
@@ -157,13 +152,13 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
 
 
         params.put("myKey", nameKey);
-        params.put("num", employee.getPhoneNum());
+        params.put("num", primaryNum);
         params.put("id", requestId);
         params.put("pin", pin);
         JSONObject parameter = new JSONObject(params);
         Log.e("sending", parameter.toString());
         Log.e("myKey", nameKey);
-        Log.e("num", employee.getPhoneNum());
+        Log.e("num",primaryNum);
         Log.e("id", requestId);
         Log.e("pin", pin);
         //OkHttpClient client = new OkHttpClient();
@@ -179,7 +174,7 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-                activity.runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Toast.makeText(getActivity().getApplicationContext(), "Couldn't verify, Please try again", Toast.LENGTH_SHORT).show();
                         ShowLoadingMessage(false);
@@ -207,36 +202,14 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
                                     editor.putString("done", "yes");
                                     editor.commit();
 
-                                    handler = new Handler(){
-                                        @Override
-                                        public void handleMessage(Message msg) {
-                                            if (msg.arg1==1){
-                                                ShowLoadingMessage(false);
-                                                trans.replace(R.id.root_frame, new ViewOwnProfileFragment());
-                                                trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                                trans.addToBackStack(null);
-                                                trans.commit();
-                                            }else{
-                                                ShowLoadingMessage(false);
-                                                Toast.makeText(getActivity().getApplicationContext(), "Signup failed.",
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    };
+                                    ShowLoadingMessage(false);
+                                    trans.replace(R.id.root_frame, new ViewOwnProfileFragment());
+                                    trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                                    trans.addToBackStack(null);
+                                    trans.commit();
 
-                                    Log.e("home3",employee.getHomeService()+"");
-                                    CatagaryEmployee catagaryEmployee = new CatagaryEmployee(employee.getName(),
-                                            employee.getGender(), employee.getDob(), employee.getHomeService(),
-                                            employee.getStatus());
 
-                                    ArrayList<String> catagories = new ArrayList<String>();
-                                    for (String key: employee.getCatagary().keySet()){
-                                        catagories.add(key);
-                                    }
-                                    Log.e("homeService4",catagaryEmployee.getHomeService()+"");
-                                    DbHelper dbHelper = new DbHelper();
-                                    dbHelper.saveEmployeeDetail(employee,catagaryEmployee,catagories,
-                                            sharedPreferences,handler);
+
 
                                     Log.e("haha", "signInWithCustomToken:onComplete:" + task.isSuccessful());
 
@@ -254,7 +227,13 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
                             });
                 }else{
                     ShowLoadingMessage(false);
-                    Toast.makeText(getActivity().getApplicationContext(),"False pin, try again",Toast.LENGTH_LONG).show();
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity.getApplicationContext(),"False pin, try again",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
                 }
 
 
@@ -278,3 +257,6 @@ public class SignUpMobileNumDialogFragment extends DialogFragment {
 
     }
 }
+
+
+

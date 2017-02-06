@@ -178,7 +178,7 @@ public class SignUpLanguageDialogFragment extends DialogFragment {
                                 FragmentManager manager = getActivity().getSupportFragmentManager();
                                 SignupAdressDialogFragment dialog = new SignupAdressDialogFragment();
                                 dialog.setCancelable(false);
-                                dialog.show(manager, "Address and NIC");
+                                dialog.show(manager, "Address");
                             }
 
                             getDialog().dismiss();

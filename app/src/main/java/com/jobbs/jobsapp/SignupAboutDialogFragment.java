@@ -112,71 +112,9 @@ public class SignupAboutDialogFragment extends DialogFragment {
 
                             if (about != null){
                                 employee.setAbout(about);
+                                Log.e("home service2",employee.getHomeService()+"");
                             }
-
-                            ShowLoadingMessage(true);
-
-                            Timer timer = new Timer();
-                            TimerTask timerTask = new TimerTask() {
-                                @Override
-                                public void run() {
-                                    handler.post(new Runnable() {
-
-                                        @Override
-                                        public void run() {
-                                            Log.e("ca","came3");
-                                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                            if (user!=null){
-                                                employee.setStatus("Hi there I'm using jobbs");
-                                                Log.e("ca","came2");
-                                                CatagaryEmployee catagaryEmployee = new CatagaryEmployee(employee.getName(),
-                                                        employee.getGender(), employee.getDob(), employee.getHomeService(),
-                                                        employee.getStatus());
-
-                                                ArrayList<String> catagories = new ArrayList<String>();
-                                                for (String key: employee.getCatagary().keySet()){
-                                                    catagories.add(key);
-                                                }
-
-                                                handler1 = new Handler(){
-                                                    @Override
-                                                    public void handleMessage(Message msg) {
-                                                        if (msg.arg1==1){
-                                                            SharedPreferences.Editor editor = sharedPref.edit();
-                                                            editor.putString("done", "yes");
-                                                            editor.commit();
-
-                                                            ShowLoadingMessage(false);
-                                                            trans.replace(R.id.root_frame, new ViewOwnProfileFragment());
-                                                            trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                                            trans.addToBackStack(null);
-                                                            trans.commit();
-                                                            activity =null;
-                                                        }else{
-                                                            ShowLoadingMessage(false);
-                                                            Toast.makeText(getActivity().getApplicationContext(), "Signup failed.",
-                                                                    Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                };
-
-                                                DbHelper dbHelper = new DbHelper();
-                                                dbHelper.saveEmployeeDetail(employee,catagaryEmployee,catagories, sharedPref,handler1);
-
-                                                activity =null;
-
-                                            }else{
-                                                changeFragment();
-                                            }
-
-                                        }
-                                    });
-
-                                }
-                            };
-
-                            timer.schedule(timerTask, 40000);
-
+                            changeFragment();
                         }
                     }
                 });
@@ -203,6 +141,7 @@ public class SignupAboutDialogFragment extends DialogFragment {
         ShowLoadingMessage(false);
         Log.e("ca","came");
         SignUpMobileNumDialogFragment dialog = new SignUpMobileNumDialogFragment();
+        dialog.setCancelable(false);
         dialog.show(manager, "Mobile Number Verification");
         activity = null;
         //getDialog().dismiss();

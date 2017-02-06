@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -20,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.digits.sdk.android.Digits;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,15 +32,24 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jobbs.jobsapp.Adapter.PagerAdapter;
+import com.jobbs.jobsapp.model.Catagaries;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
+import java.util.EventListener;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+
+
 
 //TODO: make oldLanguage selected
     public boolean isSignedIn=false;
@@ -52,10 +63,13 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private TabLayout.Tab tab1;
+    private ValueEventListener employeeEventListner;
+    private DatabaseReference employeeRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         //initialize DB,Auth and geoFire
@@ -72,7 +86,58 @@ public class MainActivity extends AppCompatActivity {
         tab1 = tabLayout.newTab().setText("SignUp");
         tabLayout.addTab(tab1);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+/*
+        DatabaseReference temp = FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_CATAGORY);
 
+        String key = temp.push().getKey();
+        Catagaries cat = new Catagaries("Taxi","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FTaxi.png?alt=media&token=392f8c66-8e2e-446e-9c9f-2b5638cb7227");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Cataring","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FFood-Catering.png?alt=media&token=710df740-e938-41a6-ab7c-5fa712894f30");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Laundry","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FLaundry.png?alt=media&token=d22d0f12-944b-412f-83a3-350ccf74dbc8");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("A/C Repair","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FAC.png?alt=media&token=d0af188c-7374-4bfa-b7d6-5a105491f190");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Electrician","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FElectrician.png?alt=media&token=e47527b7-5244-4879-b557-187ff5cfb31c");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Auto-mobile","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2Fautomobile.png?alt=media&token=035c6e26-b1fd-45c5-b273-4926fd27819f");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Photography","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FPhotography.png?alt=media&token=d464f274-2b58-4956-a2ef-320320b450e3");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("IT-Services","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FIT-Service.png?alt=media&token=eb74d5e6-0cc6-4ee2-bf41-e5025f42498a");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Teacher","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FTeacher.png?alt=media&token=ebc17721-dc7f-4e70-8046-36f6ee6aac15");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Painter","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FPainter.png?alt=media&token=27d765b1-fee5-4172-a6d0-68026407deb7");
+        temp.child(key).setValue(cat);
+
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Plumber","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FPlumber.png?alt=media&token=d792eb9e-dce7-4c17-89ab-961545baa0be");
+        temp.child(key).setValue(cat);
+
+        key = temp.push().getKey();
+        cat = new Catagaries("Repair","https://firebasestorage.googleapis.com/v0/b/jobs-8d5e5.appspot.com/o/catagories%2FHome-application.png?alt=media&token=32097aa4-1666-4c77-8327-6b917df8e6b2");
+        temp.child(key).setValue(cat);
+*/
 
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -119,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         getData();
 
         if (!utils.IsNetworkConnected(getApplicationContext())){
-            Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_LONG).show();
         }
 
     }
@@ -128,11 +193,11 @@ public class MainActivity extends AppCompatActivity {
     public void getData(){
 
         if (isSignedIn){
-            DatabaseReference employeeRef = FirebaseDatabase.getInstance().getReference().getRef().
+            employeeRef = FirebaseDatabase.getInstance().getReference().getRef().
                     child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(userId).
                     child(JobsConstants.FIREBASE_KEY_CATAGORY);
 
-            employeeRef.addValueEventListener(new ValueEventListener() {
+            employeeEventListner = employeeRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     catagoryArray = new ArrayList<String>();
@@ -256,6 +321,11 @@ public class MainActivity extends AppCompatActivity {
         if (!isSignedIn && locationListener != null){
             locationManager.removeUpdates(locationListener);
         }
+        if (employeeEventListner != null){
+            employeeRef.removeEventListener(employeeEventListner);
+        }
+
+
     }
 
     @Override

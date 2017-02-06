@@ -115,6 +115,17 @@ public class CatagaryEmployee {
     }
 
     @Exclude
+    public String getDistanceAsString(){
+        if (distance > 1000) {
+        String d = String.format("%.2f Kms",distance/1000);
+        return d;
+    }else{
+        String d = String.format("%.2f m",distance);
+        return d;
+    }
+    }
+
+    @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("name", name);

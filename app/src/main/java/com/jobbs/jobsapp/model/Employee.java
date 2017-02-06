@@ -198,7 +198,7 @@ public class Employee {
         String results="";
         for (String key : catagary.keySet()){
             if (i<catagary.keySet().size()){
-                results+=key+"\n";
+                results+=key+" / ";
             }else{
                 results+=key;
             }
@@ -213,7 +213,7 @@ public class Employee {
         String results="";
         for (String key : languages.keySet()){
             if (i<languages.keySet().size()){
-                results+=key+"\n";
+                results+=key+" / ";
             }else{
                 results+=key;
             }

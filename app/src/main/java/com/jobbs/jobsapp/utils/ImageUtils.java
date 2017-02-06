@@ -238,11 +238,13 @@ public class ImageUtils {
                             fos = new FileOutputStream(myImageFile);
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
                         } catch (IOException e) {
+                            Log.e("errorSaving","true");
                             e.printStackTrace();
                         } finally {
                             try {
                                 fos.close();
                             } catch (IOException e) {
+                                Log.e("errorSaving","true");
                                 e.printStackTrace();
                             }
                         }

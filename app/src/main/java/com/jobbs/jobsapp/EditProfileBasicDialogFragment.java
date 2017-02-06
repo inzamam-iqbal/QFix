@@ -70,7 +70,7 @@ public class EditProfileBasicDialogFragment extends DialogFragment {
 
         editText = (EditText) view.findViewById(R.id.edit_profile_basic_edit_text);
 
-        if (type.equals("email")){
+        if (type.equals("email") || type.equals("name")){
             editText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
             editText.setHint("your email");
         }else if(type.equals("address")){

@@ -1,160 +1,276 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@drawable/back2"
-    android:layout_height="match_parent">
-    <RelativeLayout
-        android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/small_margin">
-
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:id="@+id/default_tab2">
 
         <ImageView
-            android:padding="@dimen/small_margin"
-            android:src="@drawable/ind_known"
-            android:layout_width="@dimen/grid_width"
-            android:layout_height="@dimen/grid_width"
-            android:id="@+id/imageView"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
-
-        <EditText
-            android:maxLines="1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:hint="Name"
-            android:id="@+id/signup_name"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"/>
-
-        <EditText
-            android:maxLines="1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:hint="Email"
-            android:id="@+id/signup_email"
-            android:layout_below="@+id/signup_name"
-            android:layout_centerHorizontal="true" />
-
-        <RadioGroup
-            android:id="@+id/signUp_gender_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@id/signup_email">
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Male"
-                android:id="@+id/signUp_male" />
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Female"
-                android:id="@+id/signUp_female" />
-        </RadioGroup>
-
+            android:layout_marginTop="25dp"
+            android:src="@drawable/logo_big"
+            android:layout_width="200dp"
+            android:layout_height="200dp" />
 
         <TextView
-            android:textColor="#000000"
-            android:layout_marginTop="@dimen/grid_width"
+            android:layout_marginTop="50dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Click the image to change"
-            android:id="@+id/textView"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
-
-        <com.hbb20.CountryCodePicker
-            android:id="@+id/ccp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:defaultNameCode="LK"
-            android:layout_below="@+id/signUp_gender_group"
-            android:layout_alignParentLeft="true" />
-        <EditText
-            android:maxLength="12"
-            android:inputType="number"
-            android:hint="Primary number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/signUp_phone_txt"
-            android:maxLines="1"
-            android:layout_alignBottom="@+id/ccp"
-            android:layout_toRightOf="@+id/ccp"
-            android:layout_toEndOf="@+id/ccp" />
-        <com.hbb20.CountryCodePicker
-            android:id="@+id/ccp1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:defaultNameCode="LK"
-            android:layout_below="@+id/ccp"
-            android:layout_alignParentLeft="true" />
-        <EditText
-            android:maxLength="12"
-            android:inputType="number"
-            android:hint="Secondary Number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/signUp_phone_txt1"
-            android:maxLines="1"
-            android:layout_alignBottom="@+id/ccp1"
-            android:layout_toRightOf="@+id/ccp1"
-            android:layout_toEndOf="@+id/ccp1" />
-        <ImageView
-            android:layout_margin="@dimen/small_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView3"
-            android:layout_below="@+id/ccp1"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/abc_textfield_search_material"
-            android:background="#cacaca" />
-        <DatePicker
-            android:padding="@dimen/small_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/datePicker"
-            android:layout_below="@+id/textView2"
-            android:layout_centerHorizontal="true"
-            android:datePickerMode="spinner"
-            android:calendarViewShown="false"
-            android:yearListSelectorColor="@color/abc_search_url_text" />
-
-        <TextView
-            android:padding="@dimen/small_margin"
-            android:textColor="#000"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Select your Date of Birth"
-            android:id="@+id/textView2"
-            android:layout_below="@+id/imageView3"
-            android:layout_centerHorizontal="true" />
-
-        <ImageView
-            android:layout_margin="@dimen/small_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
-            android:layout_below="@+id/datePicker"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/abc_textfield_search_material"
-            android:background="#cacaca" />
+            android:text="Sign up to be a Service provider "/>
 
 
         <android.support.v7.widget.AppCompatButton
-            android:theme="@style/AppTheme.Button"
-            android:textColor="@android:color/white"
+            android:layout_marginTop="7dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Submit"
-            android:id="@+id/button"
-            android:layout_below="@id/imageView2"/>
-    </RelativeLayout>
-</ScrollView>
+            android:id="@+id/btn_signup"
+            android:text="Sign Up"
+            android:textColor="@android:color/white"
+            android:theme="@style/AppTheme.Button"
+            android:layout_marginRight="45dp"
+            android:layout_marginLeft="45dp"/>
+
+        <TextView
+            android:layout_marginTop="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already have an account?"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:layout_marginTop="7dp"
+            android:id="@+id/btn_signin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign In"
+            android:textColor="@android:color/white"
+            android:theme="@style/AppTheme.Button"
+            android:layout_marginRight="45dp"
+            android:layout_marginLeft="45dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:id="@+id/signin_tab2"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_marginTop="25dp"
+            android:src="@drawable/logo_big"
+            android:layout_width="200dp"
+            android:layout_height="200dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content">
+
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/ccp_signIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:defaultNameCode="LK" />
+
+            <EditText
+                android:id="@+id/signIn_phone_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Primary number"
+                android:inputType="number"
+                android:maxLength="12"
+                android:maxLines="1" />
+
+        </LinearLayout>
+
+
+        <android.support.v7.widget.AppCompatButton
+            android:layout_marginTop="7dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign In"
+            android:id="@+id/btn_signIn_submit"
+            android:textColor="@android:color/white"
+            android:theme="@style/AppTheme.Button"
+            android:layout_marginRight="45dp"
+            android:layout_marginLeft="45dp"/>
+
+    </LinearLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/signup_tab2">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/medium_margin">
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imageView"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:padding="@dimen/medium_margin"
+                app:civ_border_width="2dp"
+                app:civ_border_color="#313131"
+                android:src="@drawable/ind_known" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/grid_width"
+                android:text="Click the image to change"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/signup_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView"
+                android:layout_centerHorizontal="true"
+                android:hint="Name"
+                android:inputType="textPersonName"
+                android:maxLines="1" />
+
+            <EditText
+                android:id="@+id/signup_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/signup_name"
+                android:layout_centerHorizontal="true"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:maxLines="1" />
+
+            <RadioGroup
+                android:id="@+id/signUp_gender_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/signup_email"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/signUp_male"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Male" />
+
+                <RadioButton
+                    android:id="@+id/signUp_female"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female" />
+            </RadioGroup>
+
+
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/ccp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/signUp_gender_group"
+                app:defaultNameCode="LK" />
+
+            <EditText
+                android:id="@+id/signUp_phone_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ccp"
+                android:layout_toEndOf="@+id/ccp"
+                android:layout_toRightOf="@+id/ccp"
+                android:hint="Primary number"
+                android:inputType="number"
+                android:maxLength="12"
+                android:maxLines="1" />
+
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/ccp1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/ccp"
+                app:defaultNameCode="LK" />
+
+            <EditText
+                android:id="@+id/signUp_phone_txt1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ccp1"
+                android:layout_toEndOf="@+id/ccp1"
+                android:layout_toRightOf="@+id/ccp1"
+                android:hint="Secondary Number"
+                android:inputType="number"
+                android:maxLength="12"
+                android:maxLines="1" />
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ccp1"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="@dimen/medium_margin"
+                android:background="#cacaca"
+                android:src="@drawable/abc_textfield_search_material" />
+
+            <DatePicker
+                android:id="@+id/datePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView2"
+                android:layout_centerHorizontal="true"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:padding="@dimen/medium_margin"
+                android:yearListSelectorColor="@color/abc_search_url_text" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView3"
+                android:layout_centerHorizontal="true"
+                android:padding="@dimen/medium_margin"
+                android:text="Select your Date of Birth"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/datePicker"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="@dimen/medium_margin"
+                android:background="#cacaca"
+                android:src="@drawable/abc_textfield_search_material" />
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/imageView2"
+                android:text="Submit"
+                android:textColor="@android:color/white"
+                android:theme="@style/AppTheme.Button" />
+        </RelativeLayout>
+    </ScrollView>
+</FrameLayout>
+

@@ -15,14 +15,4 @@
         android:inputType="textMultiLine"
         android:maxLines="3"/>
 
-    <EditText
-        android:ems="12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/signup_nic"
-        android:hint="National Identity card Number"
-        android:maxEms="15"/>
-
-
-
 </LinearLayout>

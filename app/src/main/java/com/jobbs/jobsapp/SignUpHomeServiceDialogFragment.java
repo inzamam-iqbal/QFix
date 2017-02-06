@@ -77,8 +77,10 @@ public class SignUpHomeServiceDialogFragment extends DialogFragment {
                         selectedOption = (RadioButton) view.findViewById(selectedId);
                         String homeService = selectedOption.getText().toString();
 
-                        if(homeService.equals("yes")){
+                        if(homeService.equals("Yes")){
                             employee.setHomeService(true);
+                            Log.e("home services:","true");
+
                         }else{
                             employee.setHomeService(false);
                         }

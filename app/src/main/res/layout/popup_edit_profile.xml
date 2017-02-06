@@ -6,11 +6,11 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/small_margin">
+        android:padding="@dimen/medium_margin">
 
 
         <ImageView
-            android:padding="@dimen/small_margin"
+            android:padding="@dimen/medium_margin"
             android:src="@drawable/ind_known"
             android:layout_width="@dimen/grid_width"
             android:layout_height="@dimen/grid_width"
@@ -68,7 +68,7 @@
             android:layout_toRightOf="@+id/ccp1"
             android:layout_toEndOf="@+id/ccp1" />
         <ImageView
-            android:layout_margin="@dimen/small_margin"
+            android:layout_margin="@dimen/medium_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/imageView3"
@@ -77,7 +77,7 @@
             android:src="@drawable/abc_textfield_search_material"
             android:background="#cacaca" />
         <DatePicker
-            android:padding="@dimen/small_margin"
+            android:padding="@dimen/medium_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/datePicker"
@@ -88,7 +88,7 @@
             android:yearListSelectorColor="@color/abc_search_url_text" />
 
         <TextView
-            android:padding="@dimen/small_margin"
+            android:padding="@dimen/medium_margin"
             android:textColor="#000"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
             android:layout_centerHorizontal="true" />
 
         <ImageView
-            android:layout_margin="@dimen/small_margin"
+            android:layout_margin="@dimen/medium_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/imageView2"
@@ -114,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <ImageView
-            android:layout_margin="@dimen/small_margin"
+            android:layout_margin="@dimen/medium_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/imageView4"
@@ -129,7 +129,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <ImageView
-            android:layout_margin="@dimen/small_margin"
+            android:layout_margin="@dimen/medium_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/imageView5"

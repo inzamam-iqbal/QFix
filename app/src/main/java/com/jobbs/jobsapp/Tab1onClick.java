@@ -179,6 +179,8 @@ public class Tab1onClick extends AppCompatActivity {
                 Log.e("clicked",position+"");
                 Intent d=new Intent(Tab1onClick.this,ViewProfile.class);
                 d.putExtra("EmployeeId",catagaryEmployees.get(position).getKey());
+                d.putExtra("catagory",catagoryName);
+                d.putExtra("distance",catagaryEmployees.get(position).getDistanceAsString());
                 startActivity(d);
 
             }

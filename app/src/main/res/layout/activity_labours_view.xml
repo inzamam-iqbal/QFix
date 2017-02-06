@@ -2,7 +2,8 @@
 <FrameLayout android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@drawable/back2">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -16,18 +17,21 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:layout_gravity="center"
         android:layout_centerHorizontal="true"
-        android:padding="@dimen/small_margin"
+        android:padding="5dp"
         android:src="@drawable/img1"
         android:layout_width="170dp"
         android:layout_height="@dimen/size"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#313131"
         android:id="@+id/imageView_profilePic"/>
 
     <TextView
         android:layout_gravity="center"
-        android:padding="@dimen/small_margin"
+        android:paddingLeft="@dimen/medium_margin"
+        android:paddingRight="@dimen/medium_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -37,7 +41,7 @@
         android:theme="@style/AppTheme.Button"
         android:textColor="@android:color/white"
         android:id="@+id/button_status"
-        android:padding="@dimen/small_margin"
+        android:padding="@dimen/medium_margin"
         android:textSize="@dimen/activity_horizontal_margin"
         android:gravity="center"
         android:text="Change my Status"
@@ -57,7 +61,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -66,7 +70,7 @@
                 <TextView
                     android:background="@drawable/text_view_background"
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -80,7 +84,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -88,7 +92,7 @@
                     android:id="@+id/textView3"/>
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:background="@drawable/text_view_background"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -103,7 +107,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -111,7 +115,7 @@
                     android:id="@+id/textView" />
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:background="@drawable/text_view_background"
                     android:layout_height="wrap_content"
@@ -125,7 +129,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -133,7 +137,7 @@
                     android:id="@+id/textView2"/>
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:background="@drawable/text_view_background"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -148,7 +152,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -156,7 +160,7 @@
                     android:id="@+id/textView6" />
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:background="@drawable/text_view_background"
                     android:layout_height="wrap_content"
@@ -171,7 +175,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -179,7 +183,7 @@
                     android:id="@+id/textView5"/>
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:background="@drawable/text_view_background"
                     android:layout_height="wrap_content"
@@ -194,7 +198,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -202,7 +206,7 @@
                     android:id="@+id/textView7" />
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:background="@drawable/text_view_background"
                     android:layout_height="wrap_content"
@@ -218,7 +222,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:layout_weight="0.4"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -226,7 +230,7 @@
                     android:id="@+id/textView4" />
                 <TextView
                     android:layout_weight="0.6"
-                    android:padding="@dimen/small_margin"
+                    android:padding="@dimen/medium_margin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/text_view_background"
