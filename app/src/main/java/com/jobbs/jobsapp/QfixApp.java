@@ -13,8 +13,8 @@ import io.fabric.sdk.android.Fabric;
  */
 public class QfixApp extends Application {
 
-    private static final String TWITTER_KEY = "ed2648ca3525157ca9d3c4c1526de1f467769e6d";
-    private static final String TWITTER_SECRET = "48df61d5139abaae774bea795e0327d7de22bd9a6251878be58851e7dd02f51c";
+    private static final String TWITTER_KEY = "NRd7fXlE8ZJBRC2Y0CpYjNzFy";
+    private static final String TWITTER_SECRET = "kfsPnMCO0SI1AmgRCNnmNhuIF8XaNtDSWv1Lkz5SuhnMZZbQPc";
 
     @Override
     public void onCreate() {

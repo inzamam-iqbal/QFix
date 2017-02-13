@@ -249,6 +249,9 @@ public class Tab1onClick extends AppCompatActivity {
                     }else{
                         geoQuery.setRadius(150);
                     }
+                }else if (count==0 && geoQuery.getRadius()==150){
+                    findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    findViewById(R.id.no_one).setVisibility(View.VISIBLE);
                 }
                 Log.e("done","geoDone");
             }

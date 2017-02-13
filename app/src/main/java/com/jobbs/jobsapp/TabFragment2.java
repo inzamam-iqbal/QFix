@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +41,10 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.digits.sdk.android.AuthCallback;
+import com.digits.sdk.android.AuthConfig;
+import com.digits.sdk.android.Digits;
+import com.digits.sdk.android.DigitsAuthButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -58,6 +64,7 @@ import com.google.firebase.storage.UploadTask;
 import com.hbb20.CountryCodePicker;
 import com.jobbs.jobsapp.database.DbHelper;
 import com.jobbs.jobsapp.model.Catagaries;
+import com.jobbs.jobsapp.model.CatagaryEmployee;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.model.SignUpCatagory;
 import com.jobbs.jobsapp.model.SignUpLanguage;
@@ -103,9 +110,7 @@ public class TabFragment2 extends Fragment {
     private EditText name;
     private EditText email;
     private DatePicker datePicker;
-    private CountryCodePicker primaryCountryCode;
     private CountryCodePicker secondaryCountryCode;
-    private EditText primaryNum;
     private EditText secondaryNum;
     private ImageView profilePic;
     private Button submitBtn;
@@ -133,8 +138,8 @@ public class TabFragment2 extends Fragment {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String link;
     private String primaryNumber;
-    private Button signIn;
-    private Button signUp;
+    private DigitsAuthButton signIn;
+    private DigitsAuthButton signUp;
     private ScrollView signUpForm;
     private LinearLayout defaultView;
     private LinearLayout signInForm;
@@ -223,6 +228,9 @@ public class TabFragment2 extends Fragment {
     };*/
     private Object requestId;
     private Uri mCropImageUri;
+    private AuthCallback authCallback;
+    private OkHttpClient Httpclient;
+    private FragmentTransaction trans;
 
 
     /*private void StopReverseCliTimer() {
@@ -255,8 +263,11 @@ public class TabFragment2 extends Fragment {
 
         mRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+        trans = getFragmentManager().beginTransaction();
 
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        authCallback = ((MainActivity)getActivity()).getAuthCallBack();
+
+         sharedPref = getActivity().getSharedPreferences("login",Context.MODE_PRIVATE);
         nameKey = "-11980787113102610";
         link = "jobsappserver.herokuapp.com/a";
         linkv = "jobsappserver.herokuapp.com/b";
@@ -264,9 +275,15 @@ public class TabFragment2 extends Fragment {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Log.e("xxx","xxx");
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.e("Tab2:","Logged in");
+                    Log.e("zzz","zzz");
+                    ShowLoadingMessage(false);
+
+                    ((MainActivity)getActivity()).pagerAdapter.notifyDataSetChanged();
+                    startActivity(new Intent(getActivity().getApplicationContext(),MainActivity.class));
+
                 } else {
                     // User is signed out
                 }
@@ -288,21 +305,37 @@ public class TabFragment2 extends Fragment {
 
         initializeUiElements(rootView);
 
+        signUp.setText("Sign Up");
+        signUp.setBackgroundColor(Color.parseColor("#4e1835"));
+        signUp.setCallback(authCallback);
+
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                defaultView.setVisibility(View.GONE);
-                signUpForm.setVisibility(View.VISIBLE);
+
+                AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
+                        .withAuthCallBack(authCallback)
+                        .withPhoneNumber("+94");
+
+                Digits.authenticate(authConfigBuilder.build());
             }
         });
 
+
+        signIn.setText("Sign In");
+        signIn.setBackgroundColor(Color.parseColor("#4e1835"));
+        signIn.setCallback(authCallback);
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                defaultView.setVisibility(View.GONE);
-                signInForm.setVisibility(View.VISIBLE);
+                AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
+                        .withAuthCallBack(authCallback)
+                        .withPhoneNumber("+94");
+
+                Digits.authenticate(authConfigBuilder.build());
             }
         });
+
 
 
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -379,8 +412,6 @@ public class TabFragment2 extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(),"Invalid name", Toast.LENGTH_LONG).show();
                 }else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()){
                     Toast.makeText(getActivity().getApplicationContext(),"Invalid email", Toast.LENGTH_LONG).show();
-                }else if (primaryNum.getText().toString().length()<7){
-                    Toast.makeText(getActivity().getApplicationContext(),"Invalid primary Phone Number", Toast.LENGTH_LONG).show();
                 }else if (year<1930 || year>2005){
                     Toast.makeText(getActivity().getApplicationContext(),"Invalid Date of birth", Toast.LENGTH_LONG).show();
                 }else if(selctedGender.getText().toString()==null){
@@ -416,12 +447,9 @@ public class TabFragment2 extends Fragment {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, stream);
                         byte[] byteArray = stream.toByteArray();
 
-                        primaryNumber = primaryNum.getText().toString();
-                        if (primaryNumber.startsWith("0")){
-                            primaryNumber = primaryNumber.substring(1);
-                        }
 
-                        UploadTask uploadTask = storageRef.child("users").child(primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString()).
+
+                        UploadTask uploadTask = storageRef.child("users").child(primaryNumber).
                                 child(JobsConstants.STORAGE_REFERANCE_PROFILEPIC).putBytes(byteArray);
 
 
@@ -434,13 +462,13 @@ public class TabFragment2 extends Fragment {
 
                                 if (secondaryNum.length()>7){
                                     employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                            primaryCountryCode.getFullNumberWithPlus()+primaryNumber,
+                                            primaryNumber,
                                             secondaryCountryCode.getFullNumberWithPlus()+secondaryNum.getText().toString(),
                                             email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
                                             +"-"+ Integer.toString(day),downloadUrl);
                                 }else{
                                     employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                            primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
+                                            primaryNumber,
                                             null,email.getText().toString(),
                                             Integer.toString(year)+"-"+ Integer.toString(month)
                                                     +"-"+ Integer.toString(day),downloadUrl);
@@ -459,8 +487,8 @@ public class TabFragment2 extends Fragment {
 
                     }else{
                         employee = new Employee(name.getText().toString(),selctedGender.getText().toString(),
-                                primaryCountryCode.getFullNumberWithPlus()+primaryNum.getText().toString(),
-                                secondaryCountryCode.getFullNumberWithPlus()+primaryNumber,
+                                primaryNumber,
+                                secondaryCountryCode.getFullNumberWithPlus()+secondaryNum.getText().toString(),
                                 email.getText().toString(), Integer.toString(year)+"-"+ Integer.toString(month)
                                 +"-"+ Integer.toString(day),"default");
                         showJobDialog(v);
@@ -477,19 +505,151 @@ public class TabFragment2 extends Fragment {
         return rootView;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        SharedPreferences sharedPref= getActivity().getSharedPreferences("login",Context.MODE_PRIVATE);
+        final String authToken=sharedPref.getString("cat","abc");
+
+        Log.e("abc",authToken);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+
+        if (!authToken.equals("abc") && user ==null){
+
+            try {
+                JSONObject json = new JSONObject(authToken);
+                primaryNumber = json.getString("number");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            ShowLoadingMessage(true);
+            FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).
+                    child(primaryNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()){
+                        validate(authToken);
+                    }else{
+                        signUpForm.setVisibility(View.VISIBLE);
+                        defaultView.setVisibility(View.GONE);
+                        ShowLoadingMessage(false);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
+        }
+
+    }
+
+    private void validate(String authToken){
+
+
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        OkHttpClient.Builder b = new OkHttpClient.Builder();
+        b.readTimeout(30000, TimeUnit.MILLISECONDS);
+        b.writeTimeout(30000, TimeUnit.MILLISECONDS);
+
+        client = b.build();
+
+        String nameKey = ImageUtils.getName(getActivity().getApplicationContext());
+
+
+        //OkHttpClient client = new OkHttpClient();
+
+
+        RequestBody body = RequestBody.create(JSON, authToken.toString());
+        Request request = new Request.Builder()
+                .url("http://" + "jobsappserver.herokuapp.com/test")
+                .post(body)
+                .addHeader("content-type", "application/json; charset=utf-8")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, final IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getActivity().getApplicationContext(), "Couldn't verify, Please try again", Toast.LENGTH_SHORT).show();
+                        ShowLoadingMessage(false);
+
+                        e.printStackTrace();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String token = response.body().string();
+                if (token.length()>10){
+                    Log.e("response", token);
+                    token = token.substring(1, token.length() - 1);
+                    Log.e("response", token);
+
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+                    mAuth.signInWithCustomToken(token)
+                            .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                    SharedPreferences.Editor editor = sharedPref.edit();
+                                    editor.putString("done", "yes");
+                                    editor.commit();
+
+                                    trans.replace(R.id.root_frame, new ViewOwnProfileFragment());
+                                    trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                                    trans.addToBackStack(null);
+                                    trans.commit();
+
+                                    ShowLoadingMessage(false);
+                                    Log.e("login","done");
+                                }
+                            });
+                }else{
+                    ShowLoadingMessage(false);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity().getApplicationContext(),"False pin, try again",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+
+
+            }
+
+
+        });
+    }
+
     private void initializeUiElements(View rootView) {
         name = (EditText) rootView.findViewById(R.id.signup_name);
         email = (EditText) rootView.findViewById(R.id.signup_email);
-        primaryNum = (EditText) rootView.findViewById(R.id.signUp_phone_txt);
         secondaryNum = (EditText) rootView.findViewById(R.id.signUp_phone_txt1);
         datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
-        primaryCountryCode = (CountryCodePicker) rootView.findViewById(R.id.ccp);
         secondaryCountryCode = (CountryCodePicker) rootView.findViewById(R.id.ccp1);
         profilePic = (ImageView) rootView.findViewById(R.id.imageView);
         submitBtn = (Button) rootView.findViewById(R.id.button);
         genderGroup = (RadioGroup) rootView.findViewById(R.id.signUp_gender_group);
-        signIn = (Button)rootView.findViewById(R.id.btn_signin);
-        signUp = (Button) rootView.findViewById(R.id.btn_signup);
+        signIn = (DigitsAuthButton) rootView.findViewById(R.id.btn_signin);
+        signUp = (DigitsAuthButton) rootView.findViewById(R.id.btn_signup);
         signInForm = (LinearLayout)rootView.findViewById(R.id.signin_tab2);
         signUpForm = (ScrollView) rootView.findViewById(R.id.signup_tab2);
         defaultView = (LinearLayout) rootView.findViewById(R.id.default_tab2);
@@ -590,6 +750,7 @@ public class TabFragment2 extends Fragment {
                 .setFixAspectRatio(true)
                 .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
                 .setOutputCompressQuality(80)
+                .setRequestedSize(500,500)
                 .getIntent(getActivity());
         startActivityForResult(intent, CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
@@ -624,7 +785,7 @@ public class TabFragment2 extends Fragment {
             }
         }
 
-        dialingNumber = primaryCountryCode.getFullNumberWithPlus().toString()+primaryNum.getText().toString();
+        dialingNumber = primaryNumber;
         if (!utils.IsNetworkConnected(getActivity())) {
             Toast.makeText(getActivity().getApplicationContext(), "No Internet", Toast.LENGTH_LONG).show();
             return false;
@@ -635,8 +796,6 @@ public class TabFragment2 extends Fragment {
             return false;
         }
 
-
-        validationRequest(dialingNumber);
 
         return true;
     }
@@ -677,6 +836,10 @@ public class TabFragment2 extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Toast.makeText(getActivity().getApplicationContext(), "Couldn't verify, Please try again", Toast.LENGTH_SHORT).show();
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("cat", "abc");
+                        editor.commit();
+
                         ShowLoadingMessage(false);
                         e.printStackTrace();
                     }
@@ -703,4 +866,64 @@ public class TabFragment2 extends Fragment {
 
         });
     }
+
+    /*private void validate(String authToken){
+        ShowLoadingMessage(true);
+        OkHttpClient.Builder b = new OkHttpClient.Builder();
+        b.readTimeout(30000, TimeUnit.MILLISECONDS);
+        b.writeTimeout(30000, TimeUnit.MILLISECONDS);
+
+        Httpclient = b.build();
+
+        RequestBody body = RequestBody.create(JSON, authToken.toString());
+        Request request = new Request.Builder()
+                .url("http://anno7.herokuapp.com/test")
+                .post(body)
+                .addHeader("content-type", "application/json; charset=utf-8")
+                .build();
+
+        Httpclient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, final IOException e) {
+                //Toast.makeText(getApplicationContext(),"Please try again",Toast.LENGTH_LONG).show();
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getActivity().getApplicationContext(), "Couldn't verify21, Please try again", Toast.LENGTH_SHORT).show();
+                        ShowLoadingMessage(false);
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String reply = response.body().string();
+                Log.e("response", reply);
+                reply = reply.substring(1,reply.length()-1);
+                mAuth.signInWithCustomToken(reply)
+                        .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                Log.e("haha", "signInWithCustomToken:onComplete:" + task.isSuccessful());
+                                ShowLoadingMessage(false);
+                                gotPin = false;
+                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // the auth state listener will be notified and logic to handle the
+                                // signed in user can be handled in the listener.
+                                if (!task.isSuccessful()) {
+                                    Log.e("auth", "signInWithCustomToken", task.getException());
+                                    Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+
+                                    ShowLoadingMessage(false);
+                                }
+                            }
+                        });
+                gotPin = true;
+                Log.e("gotpin", gotPin + "");
+            }
+
+
+        });
+    }*/
 }

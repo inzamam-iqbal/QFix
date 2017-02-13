@@ -24,7 +24,7 @@
             android:text="Sign up to be a Service provider "/>
 
 
-        <android.support.v7.widget.AppCompatButton
+        <!--<android.support.v7.widget.AppCompatButton
             android:layout_marginTop="7dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,7 +33,19 @@
             android:textColor="@android:color/white"
             android:theme="@style/AppTheme.Button"
             android:layout_marginRight="45dp"
-            android:layout_marginLeft="45dp"/>
+            android:layout_marginLeft="45dp"/>-->
+
+        <com.digits.sdk.android.DigitsAuthButton
+            android:layout_marginTop="7dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_signup"
+            android:text="Sign Up"
+            android:textColor="@android:color/white"
+            android:layout_marginRight="45dp"
+            android:layout_marginLeft="45dp"
+        />
+
 
         <TextView
             android:layout_marginTop="25dp"
@@ -41,7 +53,18 @@
             android:layout_height="wrap_content"
             android:text="Already have an account?"/>
 
-        <android.support.v7.widget.AppCompatButton
+        <com.digits.sdk.android.DigitsAuthButton
+            android:layout_marginTop="7dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_signin"
+            android:text="Sign In"
+            android:textColor="@android:color/white"
+            android:layout_marginRight="45dp"
+            android:layout_marginLeft="45dp"
+            />
+
+        <!--<android.support.v7.widget.AppCompatButton
             android:layout_marginTop="7dp"
             android:id="@+id/btn_signin"
             android:layout_width="match_parent"
@@ -50,7 +73,7 @@
             android:textColor="@android:color/white"
             android:theme="@style/AppTheme.Button"
             android:layout_marginRight="45dp"
-            android:layout_marginLeft="45dp"/>
+            android:layout_marginLeft="45dp"/>-->
 
     </LinearLayout>
 
@@ -178,33 +201,12 @@
                     android:text="Female" />
             </RadioGroup>
 
-
-            <com.hbb20.CountryCodePicker
-                android:id="@+id/ccp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/signUp_gender_group"
-                app:defaultNameCode="LK" />
-
-            <EditText
-                android:id="@+id/signUp_phone_txt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/ccp"
-                android:layout_toEndOf="@+id/ccp"
-                android:layout_toRightOf="@+id/ccp"
-                android:hint="Primary number"
-                android:inputType="number"
-                android:maxLength="12"
-                android:maxLines="1" />
-
             <com.hbb20.CountryCodePicker
                 android:id="@+id/ccp1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/ccp"
+                android:layout_below="@+id/signUp_gender_group"
                 app:defaultNameCode="LK" />
 
             <EditText

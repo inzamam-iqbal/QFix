@@ -9,6 +9,23 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.jobbs.jobsapp.Tab1onClick">
 
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/no_one"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Sorry, No one is available at this moment in you area."/>
+
+    </RelativeLayout>
+
+
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

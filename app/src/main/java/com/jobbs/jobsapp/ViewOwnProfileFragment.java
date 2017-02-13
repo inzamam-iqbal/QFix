@@ -418,7 +418,7 @@ public class ViewOwnProfileFragment extends Fragment {
                 StorageReference storageRef = storage.getReferenceFromUrl("gs://jobs-8d5e5.appspot.com");
 
 
-                UploadTask uploadTask = storageRef.child(employee.getPhoneNum()).
+                UploadTask uploadTask = storageRef.child("users").child(userId).
                         child(JobsConstants.STORAGE_REFERANCE_PROFILEPIC).putBytes(imageBytes);
 
                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

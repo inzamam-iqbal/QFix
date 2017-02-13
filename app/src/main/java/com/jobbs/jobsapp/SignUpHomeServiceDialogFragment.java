@@ -73,17 +73,24 @@ public class SignUpHomeServiceDialogFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        int selectedId = radioGroup.getCheckedRadioButtonId();
-                        selectedOption = (RadioButton) view.findViewById(selectedId);
-                        String homeService = selectedOption.getText().toString();
 
-                        if(homeService.equals("Yes")){
-                            employee.setHomeService(true);
-                            Log.e("home services:","true");
+                        Integer selectedId = radioGroup.getCheckedRadioButtonId();
 
+                        if (selectedId != null){
+                            selectedOption = (RadioButton) view.findViewById(selectedId);
+                            String homeService = selectedOption.getText().toString();
+
+                            if(homeService.equals("Yes")){
+                                employee.setHomeService(true);
+                                Log.e("home services:","true");
+
+                            }else{
+                                employee.setHomeService(false);
+                            }
                         }else{
                             employee.setHomeService(false);
                         }
+
 
                         FragmentManager manager = getActivity().getSupportFragmentManager();
 

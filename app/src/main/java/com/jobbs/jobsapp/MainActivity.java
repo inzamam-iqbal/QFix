@@ -21,9 +21,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.Digits;
+import com.digits.sdk.android.DigitsException;
+import com.digits.sdk.android.DigitsSession;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,11 +44,29 @@ import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
+import com.twitter.sdk.android.core.OAuthSigning;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterCore;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.fabric.sdk.android.Fabric;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private TabLayout tabLayout;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private TabLayout.Tab tab1;
     private ValueEventListener employeeEventListner;
     private DatabaseReference employeeRef;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,17 +163,9 @@ public class MainActivity extends AppCompatActivity {
         temp.child(key).setValue(cat);
 */
 
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                isSignedInAndRegistrationComplete(user);
-            }
-        };
         Log.e("Main:pinn", ImageUtils.getName(getApplicationContext()));
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new PagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount(),isSignedIn);
         viewPager.setAdapter(pagerAdapter);
@@ -175,17 +191,85 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public AuthCallback getAuthCallBack(){
+        AuthCallback authCallback=null;
+
+        authCallback = new AuthCallback() {
+            @Override
+            public void success(DigitsSession session, String phoneNumber) {
+                // Do something with the session
+                Toast.makeText(getApplicationContext(), "sucess", Toast.LENGTH_LONG).show();
+                TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
+                TwitterAuthToken authToken = session.getAuthToken();
+
+                OAuthSigning oauthSigning = new OAuthSigning(authConfig, authToken);
+                Map<String, String> authHeaders = oauthSigning.getOAuthEchoHeadersForVerifyCredentials();
+                JSONObject json = new JSONObject();
+
+
+                for (Map.Entry<String, String> entry : authHeaders.entrySet()) {
+                    try {
+                        json.put(entry.getKey(), entry.getValue());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                Log.e("pN",session.getPhoneNumber());
+                try {
+                    json.put("number",session.getPhoneNumber());
+                } catch (JSONException e) {
+                    Log.e("couldn't put number",e.toString());
+                }
+
+                Log.e("json",json.toString());
+                SharedPreferences sharedPref = getSharedPreferences("login",Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("cat", json.toString());
+                editor.commit();
+
+                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+
+            }
+
+            @Override
+            public void failure(DigitsException exception) {
+                // Do something on failure
+            }
+        };
+        return authCallback;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user !=null){
+            Log.e("user1",user.getUid());
+        }
+
         isSignedInAndRegistrationComplete(user);
+        if (user !=null){
+            Log.e("user2",user.getUid());
+        }
         getData();
 
         if (!utils.IsNetworkConnected(getApplicationContext())){
             Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_LONG).show();
         }
+
+        SharedPreferences sharedPref= getSharedPreferences("login",Context.MODE_PRIVATE);
+        String authToken=sharedPref.getString("cat","abc");
+
+        if (!authToken.equals("abc")){
+            tabLayout.setScrollPosition(1,0f,true);
+            viewPager.setCurrentItem(1);
+
+        }
+
+
 
     }
 
@@ -246,18 +330,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("changed","chhh");
 
                 if (isSignedIn){
-                    for (String catagory : catagoryArray){
-                        geoFire.setLocation(catagory + "/" + userId, new GeoLocation(location.getLatitude(),location.getLongitude()), new GeoFire.CompletionListener() {
-                            @Override
-                            public void onComplete(String key, DatabaseError error) {
-                                if (error != null) {
-                                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                                } else {
-                                    System.out.println("Location saved on server successfully!");
-                                }
-                            }
-                        });
-                    }
+                    updateLocation(location);
                 }
 
 
@@ -286,6 +359,10 @@ public class MainActivity extends AppCompatActivity {
         }else{
             if (isSignedIn) {
                 locationManager.requestLocationUpdates(getProviderName(), 600000, 0, locationListener);
+                Location location = locationManager.getLastKnownLocation(getProviderName());
+                if (location!=null){
+                    updateLocation(location);
+                }
             }else{
                 locationManager.requestSingleUpdate(getProviderName(), locationListener,null);
 
@@ -296,13 +373,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void updateLocation(Location location){
+        for (String catagory : catagoryArray){
+            geoFire.setLocation(catagory + "/" + userId, new GeoLocation(location.getLatitude(),location.getLongitude()), new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                    if (error != null) {
+                        System.err.println("There was an error saving the location to GeoFire: " + error);
+                    } else {
+                        System.out.println("Location saved on server successfully!");
+                    }
+                }
+            });
+        }
+    }
+
     String getProviderName() {
         LocationManager locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
 
         Criteria criteria = new Criteria();
         criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
-        criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
+          criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
         criteria.setSpeedRequired(false); // Chose if speed for first location fix is required.
         criteria.setAltitudeRequired(false); // Choose if you use altitude.
         criteria.setBearingRequired(false); // Choose if you use bearing.
@@ -331,7 +423,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
     }
 
     private void turnOnLocation(){
@@ -344,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
     private void isSignedInAndRegistrationComplete(FirebaseUser user){
         if (user != null){
             isSignedIn = true;
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences sharedPref = getSharedPreferences("login",Context.MODE_PRIVATE);
             String done=sharedPref.getString("done","no");
             if(!done.equals("yes")){
                 Log.e("Main:logOut","yes");
@@ -358,3 +449,65 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+/*
+final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+                Map<String, String> params = new HashMap<String, String>();
+                JSONObject parameter = new JSONObject(params);
+
+                OkHttpClient.Builder b = new OkHttpClient.Builder();
+                b.readTimeout(30000, TimeUnit.MILLISECONDS);
+                b.writeTimeout(30000, TimeUnit.MILLISECONDS);
+
+                Httpclient = b.build();
+
+                RequestBody body = RequestBody.create(JSON, json.toString());
+                Request request = new Request.Builder()
+                        .url("http://anno7.herokuapp.com/test")
+                        .post(body)
+                        .addHeader("content-type", "application/json; charset=utf-8")
+                        .build();
+
+                Httpclient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, final IOException e) {
+                        //Toast.makeText(getApplicationContext(),"Please try again",Toast.LENGTH_LONG).show();
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Couldn't verify21, Please try again", Toast.LENGTH_SHORT).show();
+                                ShowLoadingMessage(false);
+                                e.printStackTrace();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String reply = response.body().string();
+                        Log.e("response", reply);
+                        reply = reply.substring(1,reply.length()-1);
+                        mAuth.signInWithCustomToken(reply)
+                                .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        Log.e("haha", "signInWithCustomToken:onComplete:" + task.isSuccessful());
+                                        ShowLoadingMessage(false);
+                                        gotPin = false;
+                                        // If sign in fails, display a message to the user. If sign in succeeds
+                                        // the auth state listener will be notified and logic to handle the
+                                        // signed in user can be handled in the listener.
+                                        if (!task.isSuccessful()) {
+                                            Log.e("auth", "signInWithCustomToken", task.getException());
+                                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                                    Toast.LENGTH_SHORT).show();
+
+                                            ShowLoadingMessage(false);
+                                        }
+                                    }
+                                });
+                        gotPin = true;
+                        Log.e("gotpin", gotPin + "");
+                    }
+
+
+                });
+ */

@@ -6,6 +6,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,14 +69,29 @@ public class TabFragment1 extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent d=new Intent(getActivity(),Tab1onClick.class);
-                d.putExtra("name",catagaries.get(position).getName());
-                startActivity(d);
+                if (position==0){
+
+                }else{
+                    Intent d=new Intent(getActivity(),Tab1onClick.class);
+                    d.putExtra("name",catagaries.get(position).getName());
+                    startActivity(d);
+                }
+
 
             }
         });
         return rootView;
     }
 
+
+    public void showTaxiDialog(View view) {
+
+        FragmentManager manager = getActivity().getSupportFragmentManager();
+
+        SignUpJobCatagaryDialogFragment dialog = new SignUpJobCatagaryDialogFragment();
+        dialog.setCancelable(false);
+        dialog.show(manager, "Job Catagory");
+
+    }
 
 }
