@@ -12,10 +12,10 @@
         android:id="@+id/default_tab2">
 
         <ImageView
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="45dp"
             android:src="@drawable/logo_big"
-            android:layout_width="200dp"
-            android:layout_height="200dp" />
+            android:layout_width="150dp"
+            android:layout_height="150dp" />
 
         <TextView
             android:layout_marginTop="50dp"
@@ -36,7 +36,7 @@
             android:layout_marginLeft="45dp"/>-->
 
         <com.digits.sdk.android.DigitsAuthButton
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_signup"
@@ -48,13 +48,13 @@
 
 
         <TextView
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="45dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Already have an account?"/>
 
         <com.digits.sdk.android.DigitsAuthButton
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_signin"
@@ -207,7 +207,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/signUp_gender_group"
-                app:defaultNameCode="LK" />
+                app:defaultNameCode="QA"
+                 />
 
             <EditText
                 android:id="@+id/signUp_phone_txt1"

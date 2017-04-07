@@ -263,11 +263,11 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref= getSharedPreferences("login",Context.MODE_PRIVATE);
         String authToken=sharedPref.getString("cat","abc");
 
-        if (!authToken.equals("abc")){
-            tabLayout.setScrollPosition(1,0f,true);
-            viewPager.setCurrentItem(1);
-
-        }
+//        if (!authToken.equals("abc")){
+//            tabLayout.setScrollPosition(1,0f,true);
+//            viewPager.setCurrentItem(1);
+//
+//        }
 
 
 
@@ -440,6 +440,7 @@ public class MainActivity extends AppCompatActivity {
             if(!done.equals("yes")){
                 Log.e("Main:logOut","yes");
                 mAuth.signOut();
+                isSignedIn=false;
             }else{
                 userId = user.getUid();
                 tab1.setText("Profile");

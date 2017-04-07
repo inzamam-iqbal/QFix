@@ -50,9 +50,11 @@ public class SignUpLanguageDialogFragment extends DialogFragment {
 
 
         languageArray = new ArrayList<>();
-        languageArray.add(new SignUpLanguage("Sinhala"));
-        languageArray.add(new SignUpLanguage("Tamil"));
+        languageArray.add(new SignUpLanguage("Arabic"));
         languageArray.add(new SignUpLanguage("English"));
+        languageArray.add(new SignUpLanguage("Hindi"));
+        languageArray.add(new SignUpLanguage("Malayalam"));
+        languageArray.add(new SignUpLanguage("Tamil"));
 
         try{
             isEdit = getArguments().getBoolean("edit");

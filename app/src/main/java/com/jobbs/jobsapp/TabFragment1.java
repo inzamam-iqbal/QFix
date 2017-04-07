@@ -48,9 +48,14 @@ public class TabFragment1 extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot data:dataSnapshot.getChildren()){
                     rootView.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    catagaries.add(data.getValue(Catagaries.class));
-                    catagariesIds.add(data.getKey());
-                    gridAdapter.notifyDataSetChanged();
+                    Catagaries temp = data.getValue(Catagaries.class);
+                    if (!temp.getName().equals("Taxi-Three Wheeler") && !temp.getName().equals("Taxi-Nano")
+                            && !temp.getName().equals("Taxi-Car") && !temp.getName().equals("Taxi-Van")){
+                        catagaries.add(temp);
+                        catagariesIds.add(data.getKey());
+                        gridAdapter.notifyDataSetChanged();
+                    }
+
 
                 }
             }
@@ -70,7 +75,7 @@ public class TabFragment1 extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position==0){
-
+                    showTaxiDialog(rootView);
                 }else{
                     Intent d=new Intent(getActivity(),Tab1onClick.class);
                     d.putExtra("name",catagaries.get(position).getName());
@@ -88,8 +93,7 @@ public class TabFragment1 extends Fragment {
 
         FragmentManager manager = getActivity().getSupportFragmentManager();
 
-        SignUpJobCatagaryDialogFragment dialog = new SignUpJobCatagaryDialogFragment();
-        dialog.setCancelable(false);
+        TaxiDialogFragment dialog = new TaxiDialogFragment();
         dialog.show(manager, "Job Catagory");
 
     }

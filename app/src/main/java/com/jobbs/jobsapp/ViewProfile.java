@@ -14,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.utils.ImageUtils;
@@ -35,11 +36,16 @@ public class ViewProfile extends AppCompatActivity {
 
         final String employeeId = getIntent().getStringExtra("EmployeeId");
 
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+
+        DatabaseReference dbEmployeeRef = dbRef.
                 child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(employeeId);
 
         catagory = getIntent().getStringExtra("catagory");
         distance = getIntent().getStringExtra("distance");
+
+        final DatabaseReference callRef =  dbRef.child(JobsConstants.FIREBASE_REFERANCE_CALL_PRESS)
+                .child(catagory).child(employeeId);
 
         //init UI stuff
         txt_distance = (TextView)findViewById(R.id.textView_distance);
@@ -58,7 +64,7 @@ public class ViewProfile extends AppCompatActivity {
         btn_sms = (ImageButton)findViewById(R.id.button_sms);
 
 
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        dbEmployeeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -80,6 +86,9 @@ public class ViewProfile extends AppCompatActivity {
                 btn_call.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        String key = callRef.push().getKey();
+                        callRef.child(key).setValue(ServerValue.TIMESTAMP);
+
                         Intent callIntent = new Intent(Intent.ACTION_CALL);
                         callIntent.setData(Uri.parse("tel:"+employeeId));
                         startActivity(callIntent);
@@ -89,6 +98,9 @@ public class ViewProfile extends AppCompatActivity {
                 btn_sms.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        String key = callRef.push().getKey();
+                        callRef.child(key).setValue(ServerValue.TIMESTAMP);
+
                         Intent intent=new Intent(Intent.ACTION_VIEW);
                         intent.setType("vnd.android-dir/mms-sms");
                         intent.putExtra("address",employeeId);

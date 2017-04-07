@@ -118,7 +118,7 @@ public class SignUpJobCatagaryDialogFragment extends DialogFragment {
                         }
                     }
 
-                    if(!listitems.contains(signUpCatagory)){
+                    if(!listitems.contains(signUpCatagory) && !signUpCatagory.getName().equals("Taxi")){
                         listitems.add(signUpCatagory);
                     }
                 }

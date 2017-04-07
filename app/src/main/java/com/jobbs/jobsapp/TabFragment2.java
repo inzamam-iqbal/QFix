@@ -315,7 +315,7 @@ public class TabFragment2 extends Fragment {
 
                 AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
                         .withAuthCallBack(authCallback)
-                        .withPhoneNumber("+94");
+                        .withPhoneNumber("+974");
 
                 Digits.authenticate(authConfigBuilder.build());
             }
@@ -330,7 +330,7 @@ public class TabFragment2 extends Fragment {
             public void onClick(View view) {
                 AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
                         .withAuthCallBack(authCallback)
-                        .withPhoneNumber("+94");
+                        .withPhoneNumber("+974");
 
                 Digits.authenticate(authConfigBuilder.build());
             }
