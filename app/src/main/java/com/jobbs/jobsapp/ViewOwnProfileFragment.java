@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -75,11 +76,17 @@ public class ViewOwnProfileFragment extends Fragment {
     private String userId;
     private ValueEventListener dbValueEventListner;
     private DatabaseReference dbRef;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
+
+        Bundle params = new Bundle();
+        params.putString("user_id", userId);
+        mFirebaseAnalytics.logEvent("view_own_profile", params);
     }
 
     @Override

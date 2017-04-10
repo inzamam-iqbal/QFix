@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,10 +44,22 @@ public class ViewProfile extends AppCompatActivity {
         DatabaseReference dbEmployeeRef = dbRef.
                 child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(employeeId);
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
         catagory = getIntent().getStringExtra("catagory");
         distance = getIntent().getStringExtra("distance");
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        Bundle params = new Bundle();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            params.putString("employee_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        } else {
+            params.putString("employee_id", " ");
+        }
+        params.putString("employeeId", employeeId);
+        params.putString("catagory", catagory);
+        mFirebaseAnalytics.logEvent("view_employee_profile", params);
+
+
 
         //init UI stuff
         txt_distance = (TextView)findViewById(R.id.textView_distance);

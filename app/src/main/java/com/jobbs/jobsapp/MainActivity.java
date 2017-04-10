@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
             turnOnLocation();
         }else{
             if (isSignedIn) {
-                locationManager.requestLocationUpdates(getProviderName(), 600000, 0, locationListener);
+                locationManager.requestLocationUpdates(getProviderName(), 600000, 50, locationListener);
                 Location location = locationManager.getLastKnownLocation(getProviderName());
                 if (location!=null){
                     updateLocation(location);
@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
 
         Criteria criteria = new Criteria();
         criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
-          criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
+        criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
         criteria.setSpeedRequired(false); // Chose if speed for first location fix is required.
         criteria.setAltitudeRequired(false); // Choose if you use altitude.
         criteria.setBearingRequired(false); // Choose if you use bearing.
@@ -455,6 +455,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("signed","gotcha");
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        moveTaskToBack(true);
     }
 }
 

@@ -21,6 +21,8 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,6 +50,7 @@ public class Tab1onClick extends AppCompatActivity {
     private LocationListener locationListner;
     private String lastKey;
     private int count;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,18 @@ public class Tab1onClick extends AppCompatActivity {
         setContentView(R.layout.activity_tab1on_click);
 
         //get the name of the catagory selected
+
         catagoryName = getIntent().getStringExtra("name");
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle params = new Bundle();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            params.putString("employee_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        } else {
+            params.putString("employee_id", " ");
+        }
+
+        params.putString("catagory", catagoryName);
+        mFirebaseAnalytics.logEvent("view_catagory", params);
 
         if (!utils.IsNetworkConnected(getApplicationContext())){
             Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
@@ -64,6 +78,7 @@ public class Tab1onClick extends AppCompatActivity {
         catagaryEmployees = new ArrayList<>();
 
         getData(catagoryName);
+
 
     }
 
