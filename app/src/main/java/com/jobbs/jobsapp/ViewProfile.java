@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,7 @@ public class ViewProfile extends AppCompatActivity {
             textView_catogory,textView_language, txt_name2,txt_name1,txt_catagory,txt_distance;
     private ImageButton btn_call, btn_sms;
     private ImageView profilePic;
+    private FirebaseAnalytics mFirebaseAnalytics;
     String catagory, distance;
 
     @Override
@@ -41,11 +43,10 @@ public class ViewProfile extends AppCompatActivity {
         DatabaseReference dbEmployeeRef = dbRef.
                 child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).child(employeeId);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         catagory = getIntent().getStringExtra("catagory");
         distance = getIntent().getStringExtra("distance");
-
-        final DatabaseReference callRef =  dbRef.child(JobsConstants.FIREBASE_REFERANCE_CALL_PRESS)
-                .child(catagory).child(employeeId);
 
         //init UI stuff
         txt_distance = (TextView)findViewById(R.id.textView_distance);
@@ -86,8 +87,11 @@ public class ViewProfile extends AppCompatActivity {
                 btn_call.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String key = callRef.push().getKey();
-                        callRef.child(key).setValue(ServerValue.TIMESTAMP);
+                        Bundle params = new Bundle();
+                        params.putString("employee_id", employeeId);
+                        params.putString("catagory", catagory);
+                        params.putString("type", "call");
+                        mFirebaseAnalytics.logEvent("contact_employee", params);
 
                         Intent callIntent = new Intent(Intent.ACTION_CALL);
                         callIntent.setData(Uri.parse("tel:"+employeeId));
@@ -98,8 +102,11 @@ public class ViewProfile extends AppCompatActivity {
                 btn_sms.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String key = callRef.push().getKey();
-                        callRef.child(key).setValue(ServerValue.TIMESTAMP);
+                        Bundle params = new Bundle();
+                        params.putString("employee_id", employeeId);
+                        params.putString("catagory", catagory);
+                        params.putString("type", "sms");
+                        mFirebaseAnalytics.logEvent("contact_employee", params);
 
                         Intent intent=new Intent(Intent.ACTION_VIEW);
                         intent.setType("vnd.android-dir/mms-sms");

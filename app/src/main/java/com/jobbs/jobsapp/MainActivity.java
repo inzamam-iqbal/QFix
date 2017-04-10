@@ -29,6 +29,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
     private ValueEventListener employeeEventListner;
     private DatabaseReference employeeRef;
     private ViewPager viewPager;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
         //initialize DB,Auth and geoFire
         DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference().
                 child(JobsConstants.FIREBASE_REFERANCE_LOCATION);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         geoFire = new GeoFire(locationRef);
 
@@ -248,6 +253,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user !=null){
             Log.e("user1",user.getUid());
+            mFirebaseAnalytics.setUserProperty("isEmloyee", "yes");
+        } else {
+            mFirebaseAnalytics.setUserProperty("isEmloyee", "No");
         }
 
         isSignedInAndRegistrationComplete(user);
