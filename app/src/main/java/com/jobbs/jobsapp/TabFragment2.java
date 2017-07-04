@@ -68,7 +68,6 @@ import com.jobbs.jobsapp.model.CatagaryEmployee;
 import com.jobbs.jobsapp.model.Employee;
 import com.jobbs.jobsapp.model.SignUpCatagory;
 import com.jobbs.jobsapp.model.SignUpLanguage;
-import com.jobbs.jobsapp.signUp.CallReceiver;
 import com.jobbs.jobsapp.utils.ImageCompressionAsyncTask;
 import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
@@ -148,84 +147,7 @@ public class TabFragment2 extends Fragment {
     private Button signInSubmit;
 
 
- /*   private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            if (intent.getAction().equals(CallReceiver.MSG_CALL_START)) {
-                Log.e("Tab2:call detected", "true");
-                if (intent.getBooleanExtra("incoming", false) && gotPin) {
-                    HangupCall();
-                    gotPin=false;
-                    final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-                    Map<String, String> params = new HashMap<String, String>();
-                    String recivedNum = intent.getStringExtra("number");
-                    params.put("myKey", nameKey);
-                    params.put("num", dialingNumber);
-                    params.put("id", requestId.toString());
-                    params.put("pin", recivedNum.substring(recivedNum.length() - 4));
-                    JSONObject parameter = new JSONObject(params);
 
-                    RequestBody body = RequestBody.create(JSON, parameter.toString());
-                    Request request = new Request.Builder()
-                            .url("http://" + linkv)
-                            .post(body)
-                            .addHeader("content-type", "application/json; charset=utf-8")
-                            .build();
-
-                    client.newCall(request).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, final IOException e) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(getActivity().getApplicationContext(), "Couldn't verify, Please try again", Toast.LENGTH_SHORT).show();
-                                    ShowLoadingMessage(false);
-                                    e.printStackTrace();
-                                }
-                            });
-
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            String token = response.body().string();
-                            Log.e("Tab2:Auth response", token);
-                            token = token.substring(1, token.length() - 1);
-
-                            mAuth.signInWithCustomToken(token)
-                                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<AuthResult> task) {
-                                            Log.e("Tab2", "signInWithCustomToken:onComplete:" + task.isSuccessful());
-                                            ShowLoadingMessage(false);
-                                            gotPin = false;
-                                            // If sign in fails, display a message to the user. If sign in succeeds
-                                            // the auth state listener will be notified and logic to handle the
-                                            // signed in user can be handled in the listener.
-                                            if (!task.isSuccessful()) {
-                                                Log.e("Tab2:", "signInWithCustomToken", task.getException());
-                                                Toast.makeText(getActivity().getApplicationContext(), "Authentication failed.",
-                                                        Toast.LENGTH_SHORT).show();
-
-                                                ShowLoadingMessage(false);
-                                            }
-                                        }
-                                    });
-
-                        }
-
-
-                    });
-
-                }
-
-            }
-            if (intent.getAction().equals(CallReceiver.MSG_CALL_END)) {
-                if (!intent.getBooleanExtra("incoming", false)) {
-                }
-
-            }
-        }
-    };*/
     private Object requestId;
     private Uri mCropImageUri;
     private AuthCallback authCallback;
@@ -233,29 +155,7 @@ public class TabFragment2 extends Fragment {
     private FragmentTransaction trans;
 
 
-    /*private void StopReverseCliTimer() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-            timerTask = null;
-        }
-    }*/
 
-    /*private void HangupCall() {
-        try {
-            TelephonyManager tm = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-            Class c = Class.forName(tm.getClass().getName());
-            Method m = c.getDeclaredMethod("getITelephony");
-            m.setAccessible(true);
-            Object telephonyService = m.invoke(tm);
-            c = Class.forName(telephonyService.getClass().getName());
-            m = c.getDeclaredMethod("endCall");
-            m.setAccessible(true);
-            m.invoke(telephonyService);
-        } catch (Exception ex) {
-            Log.e("Failed to hangup the", ex.getMessage());
-        }
-    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -290,9 +190,6 @@ public class TabFragment2 extends Fragment {
                 // ...
             }
         };
-
-       // getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_START));
-     //   getActivity().registerReceiver(receiver, new IntentFilter(CallReceiver.MSG_CALL_END));
 
 
     }

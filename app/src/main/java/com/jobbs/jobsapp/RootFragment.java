@@ -46,7 +46,7 @@ public class RootFragment extends Fragment {
 
         }
 
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
 
         return view;
     }
