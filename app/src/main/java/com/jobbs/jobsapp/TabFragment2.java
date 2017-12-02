@@ -41,10 +41,10 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
-import com.digits.sdk.android.AuthCallback;
-import com.digits.sdk.android.AuthConfig;
-import com.digits.sdk.android.Digits;
-import com.digits.sdk.android.DigitsAuthButton;
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ResultCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -86,6 +86,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -137,8 +138,9 @@ public class TabFragment2 extends Fragment {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String link;
     private String primaryNumber;
-    private DigitsAuthButton signIn;
-    private DigitsAuthButton signUp;
+    private Button signInBtn;
+    private Button signUpBtn;
+
     private ScrollView signUpForm;
     private LinearLayout defaultView;
     private LinearLayout signInForm;
@@ -150,11 +152,10 @@ public class TabFragment2 extends Fragment {
 
     private Object requestId;
     private Uri mCropImageUri;
-    private AuthCallback authCallback;
     private OkHttpClient Httpclient;
     private FragmentTransaction trans;
 
-
+    private static final int RC_SIGN_IN = 123;
 
 
     @Override
@@ -165,12 +166,10 @@ public class TabFragment2 extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         trans = getFragmentManager().beginTransaction();
 
-        authCallback = ((MainActivity)getActivity()).getAuthCallBack();
 
          sharedPref = getActivity().getSharedPreferences("login",Context.MODE_PRIVATE);
         nameKey = "-11980787113102610";
-        link = "jobsappserver.herokuapp.com/a";
-        linkv = "jobsappserver.herokuapp.com/b";
+
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -202,37 +201,21 @@ public class TabFragment2 extends Fragment {
 
         initializeUiElements(rootView);
 
-        signUp.setText("Sign Up");
-        signUp.setBackgroundColor(Color.parseColor("#4e1835"));
-        signUp.setCallback(authCallback);
 
-        signUp.setOnClickListener(new View.OnClickListener() {
+        signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
-                        .withAuthCallBack(authCallback)
-                        .withPhoneNumber("+974");
-
-                Digits.authenticate(authConfigBuilder.build());
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder().setTheme(R.style.signInTheme)
+                                .setAvailableProviders(
+                                        Arrays.asList(
+                                                new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build()
+                                        ))
+                                .build(),
+                        RC_SIGN_IN);
             }
         });
-
-
-        signIn.setText("Sign In");
-        signIn.setBackgroundColor(Color.parseColor("#4e1835"));
-        signIn.setCallback(authCallback);
-        signIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
-                        .withAuthCallBack(authCallback)
-                        .withPhoneNumber("+974");
-
-                Digits.authenticate(authConfigBuilder.build());
-            }
-        });
-
 
 
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -272,7 +255,7 @@ public class TabFragment2 extends Fragment {
                     String fullNumber = ((CountryCodePicker)rootView.findViewById(R.id.ccp_signIn)).
                             getFullNumberWithPlus() + number;
 
-                    validationRequest(fullNumber);
+
 
                     FragmentManager manager = getActivity().getSupportFragmentManager();
 
@@ -407,32 +390,30 @@ public class TabFragment2 extends Fragment {
     public void onResume() {
         super.onResume();
 
+        Log.e("on Resume", "called");
 
-        SharedPreferences sharedPref= getActivity().getSharedPreferences("login",Context.MODE_PRIVATE);
-        final String authToken=sharedPref.getString("cat","abc");
 
-        Log.e("abc",authToken);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        Log.e("pNo", user.getPhoneNumber());
+        if (user != null) {
 
-
-
-        if (!authToken.equals("abc") && user ==null){
-
-            try {
-                JSONObject json = new JSONObject(authToken);
-                primaryNumber = json.getString("number");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            ShowLoadingMessage(true);
             FirebaseDatabase.getInstance().getReference().child(JobsConstants.FIREBASE_REFERANCE_EMPLOYEE).
-                    child(primaryNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+                    child(user.getPhoneNumber()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()){
-                        validate(authToken);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("done", "yes");
+                        editor.commit();
+
+                        trans.replace(R.id.root_frame, new ViewOwnProfileFragment());
+                        trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                        trans.addToBackStack(null);
+                        trans.commit();
+
+                        ShowLoadingMessage(false);
+                        Log.e("login", "done");
                     }else{
                         signUpForm.setVisibility(View.VISIBLE);
                         defaultView.setVisibility(View.GONE);
@@ -545,8 +526,9 @@ public class TabFragment2 extends Fragment {
         profilePic = (ImageView) rootView.findViewById(R.id.imageView);
         submitBtn = (Button) rootView.findViewById(R.id.button);
         genderGroup = (RadioGroup) rootView.findViewById(R.id.signUp_gender_group);
-        signIn = (DigitsAuthButton) rootView.findViewById(R.id.btn_signin);
-        signUp = (DigitsAuthButton) rootView.findViewById(R.id.btn_signup);
+
+        signInBtn = (Button) rootView.findViewById(R.id.btn_signin);
+        signUpBtn = (Button) rootView.findViewById(R.id.btn_signup);
         signInForm = (LinearLayout)rootView.findViewById(R.id.signin_tab2);
         signUpForm = (ScrollView) rootView.findViewById(R.id.signup_tab2);
         defaultView = (LinearLayout) rootView.findViewById(R.id.default_tab2);
@@ -614,7 +596,32 @@ public class TabFragment2 extends Fragment {
     @SuppressLint("NewApi")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // handle result of pick image chooser
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            // Successfully signed in
+            if (resultCode == ResultCodes.OK) {
+                String name = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                Log.e("id", name + "h");
+                Toast.makeText(getActivity(), "OTP verification success", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                // Sign in failed
+                if (response == null) {
+                    // User pressed back button
+                    Log.e("Login", "Login canceled by User");
+                    return;
+                }
+                if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
+                    Log.e("Login", "No Internet Connection");
+                    return;
+                }
+                if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                    Log.e("Login", "Unknown Error");
+                    return;
+                }
+            }
+            Log.e("Login", "Unknown sign in response");
+        } else if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri imageUri = CropImage.getPickImageResultUri(getContext(), data);
 
             // For API >= 23 we need to check specifically that we have permissions to read external storage.
@@ -705,7 +712,7 @@ public class TabFragment2 extends Fragment {
         //getActivity().unregisterReceiver(receiver);
     }
 
-    private void validationRequest(String number){
+   /* private void validationRequest(String number){
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         Map<String, String> params = new HashMap<String, String>();
         params.put("myKey", nameKey);
@@ -762,7 +769,7 @@ public class TabFragment2 extends Fragment {
 
 
         });
-    }
+    }*/
 
     /*private void validate(String authToken){
         ShowLoadingMessage(true);

@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
 import com.jobbs.jobsapp.MainActivity;
 import com.jobbs.jobsapp.RootFragment;
@@ -24,13 +25,14 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-
+        Log.e("from adaptor", signedIn + "");
         switch (position) {
             case 0:
                 TabFragment1 tab1 = new TabFragment1();
                 return tab1;
             case 1:
                 if (signedIn){
+                    Log.e("from adaptor", "yes");
                     return  new ViewOwnProfileFragment();
                 }else{
                     return new RootFragment();

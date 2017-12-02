@@ -8,87 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:254792180878:android:94cffbc4b7d0f549",
-        "android_client_info": {
-          "package_name": "com.jobbs.jobs"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "254792180878-9mf7blggh2l19slpm1fi1t545ilrgush.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.jobbs.jobs",
-            "certificate_hash": "935D6A8E1151D8B61A98ECAED711EACCD08239AF"
-          }
-        },
-        {
-          "client_id": "254792180878-1lqdj8fa6kp6k2b71rmhq3c05buajk4k.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA_8oOUV115CfFKRxGhnsde53ka_0hz-L4"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "254792180878-1lqdj8fa6kp6k2b71rmhq3c05buajk4k.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:254792180878:android:4aaa8f10ed9bee0e",
-        "android_client_info": {
-          "package_name": "com.jobs.inzi.jobsapp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "254792180878-1lqdj8fa6kp6k2b71rmhq3c05buajk4k.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA_8oOUV115CfFKRxGhnsde53ka_0hz-L4"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:254792180878:android:f341bd3b444f3be0",
         "android_client_info": {
           "package_name": "com.jobbs.jobsapp"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "254792180878-hrcdk8hjbd45mj7d23blgh40a4gn0f8h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jobbs.jobsapp",
+            "certificate_hash": "935d6a8e1151d8b61a98ecaed711eaccd08239af"
+          }
+        },
         {
           "client_id": "254792180878-1lqdj8fa6kp6k2b71rmhq3c05buajk4k.apps.googleusercontent.com",
           "client_type": 3

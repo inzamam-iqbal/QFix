@@ -21,16 +21,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.digits.sdk.android.AuthCallback;
-import com.digits.sdk.android.Digits;
-import com.digits.sdk.android.DigitsException;
-import com.digits.sdk.android.DigitsSession;
+
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.AuthResult;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,15 +42,10 @@ import com.jobbs.jobsapp.utils.ImageUtils;
 import com.jobbs.jobsapp.utils.JobsConstants;
 import com.jobbs.jobsapp.utils.utils;
 
-import com.twitter.sdk.android.core.OAuthSigning;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
-import com.twitter.sdk.android.core.TwitterCore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import io.fabric.sdk.android.Fabric;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -108,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         geoFire = new GeoFire(locationRef);
 
         mAuth = FirebaseAuth.getInstance();
+        Log.e("isSined", mAuth.getUid() + "h");
+        Log.e("isSined", isSignedIn + "y");
 
         //setup the page
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -197,54 +191,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public AuthCallback getAuthCallBack(){
-        AuthCallback authCallback=null;
 
-        authCallback = new AuthCallback() {
-            @Override
-            public void success(DigitsSession session, String phoneNumber) {
-                // Do something with the session
-                Toast.makeText(getApplicationContext(), "sucess", Toast.LENGTH_LONG).show();
-                TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
-                TwitterAuthToken authToken = session.getAuthToken();
-
-                OAuthSigning oauthSigning = new OAuthSigning(authConfig, authToken);
-                Map<String, String> authHeaders = oauthSigning.getOAuthEchoHeadersForVerifyCredentials();
-                JSONObject json = new JSONObject();
-
-
-                for (Map.Entry<String, String> entry : authHeaders.entrySet()) {
-                    try {
-                        json.put(entry.getKey(), entry.getValue());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                Log.e("pN",session.getPhoneNumber());
-                try {
-                    json.put("number",session.getPhoneNumber());
-                } catch (JSONException e) {
-                    Log.e("couldn't put number",e.toString());
-                }
-
-                Log.e("json",json.toString());
-                SharedPreferences sharedPref = getSharedPreferences("login",Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("cat", json.toString());
-                editor.commit();
-
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
-
-            }
-
-            @Override
-            public void failure(DigitsException exception) {
-                // Do something on failure
-            }
-        };
-        return authCallback;
-    }
 
     @Override
     protected void onResume() {
@@ -301,7 +248,6 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                @Override
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
@@ -442,17 +388,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void isSignedInAndRegistrationComplete(FirebaseUser user){
         if (user != null){
-            isSignedIn = true;
+
             SharedPreferences sharedPref = getSharedPreferences("login",Context.MODE_PRIVATE);
             String done=sharedPref.getString("done","no");
             if(!done.equals("yes")){
                 Log.e("Main:logOut","yes");
-                mAuth.signOut();
                 isSignedIn=false;
             }else{
+
                 userId = user.getUid();
                 tab1.setText("Profile");
                 Log.e("signed","gotcha");
+                isSignedIn = true;
             }
         }
     }
